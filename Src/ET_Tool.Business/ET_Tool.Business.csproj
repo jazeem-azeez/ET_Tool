@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="IngestActors\LookUpActors\" />
     <Folder Include="EgressActors\" />
   </ItemGroup>
 
