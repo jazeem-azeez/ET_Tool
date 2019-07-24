@@ -11,4 +11,8 @@
     <PackageReference Include="Serilog.Sinks.ColoredConsole" Version="3.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ET_Tool.Common\ET_Tool.Common.csproj" />
+  </ItemGroup>
+
 </Project>
