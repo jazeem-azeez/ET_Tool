@@ -1,33 +1,26 @@
 ﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using CsvHelper;
-using ET_Tool.Common.ConsoleIO;
+using System.Diagnostics.Tracing;
+using ET_Tool.Common.Logger;
+
+using Microsoft.Extensions.Configuration;
+using Serilog;
 
 namespace ET_Tool
 {
     internal class Program
     {
-  
-
         private static void Main(string[] args)
         {
-            Console.WriteLine("ET_Tool");
-            ConsoleProgressBar progressBar = new ConsoleProgressBar();
-            Console.Write("Working....");
-            int i = 0;
-            while (i <= 100)
-            {
-                progressBar.DrawTextProgressBar(i, 100);
-                i++;
-                Task.Delay(100).GetAwaiter().GetResult();
-            }
+           
 
-            using (var reader = new StreamReader("path\\to\\file.csv"))
-            using (var csv = new CsvReader(reader))
-            {
-                var records = csv.GetRecords<dynamic>();
-            }
+            var configuration = new ConfigurationBuilder()
+          .AddJsonFile("appsettings.json")
+          .Build();
+
+            var Logger = new EtLogger(configuration);
+
+            Logger.Log("Hello, Serilog!",EventLevel.LogAlways); 
+            //Logger.CloseAndFlush();
             Console.ReadLine();
             /*
              * 1. Load Configurations
@@ -38,16 +31,16 @@ namespace ET_Tool
              *          ]
              *      Get Ingest Configuration
              *          [
-             *          Load Main Data Source 
+             *          Load Main Data Source
              *          Load Lookups
              *          Load Transformation Lookups
              *          ]
-             *  
+             *
              * 2. Run Extraction Phase
              * 3. Run Transformation Phase
              * 4. Emit OutPut
              * 5. CheckSum Output , Input
-             * 
+             *
              */
         }
     }
