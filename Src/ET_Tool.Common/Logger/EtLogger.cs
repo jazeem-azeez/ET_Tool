@@ -61,7 +61,7 @@ namespace ET_Tool.Common.Logger
             }
         }
 
-        public void ProgressBar(int progress, int total, int level = 0) => this._progressBar.DrawTextProgressBar(progress, total, level);
+        public void ProgressBar(int progress, int total, int level = -1) => this._progressBar.DrawTextProgressBar(progress, total, level);
         private string AlignCentre(string text, int width)
         {
             text = text.Length > width ? text.Substring(0, width - 3) + "..." : text;

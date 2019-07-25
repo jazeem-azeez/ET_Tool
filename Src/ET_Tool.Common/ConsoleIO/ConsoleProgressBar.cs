@@ -7,12 +7,14 @@ namespace ET_Tool.Common.ConsoleIO
         public ConsoleProgressBar()
         {
         }
-        public void DrawTextProgressBar(int progress, int total, int level = 0, int startCursorLeft = 0, int size = 32)
+        public void DrawTextProgressBar(int progress, int total, int level = -1, int startCursorLeft = 0, int size = 32)
         {
             Console.CursorVisible = false;
             int currTop = Console.CursorTop;
-            Console.CursorTop = Console.LargestWindowHeight - (2*(level+1));
-
+            if (level != -1)
+            {
+                Console.CursorTop = Console.LargestWindowHeight - (2 * (level + 1));
+            }
 
             int startPos = startCursorLeft + 0;
             Console.CursorLeft = startPos;
@@ -42,7 +44,7 @@ namespace ET_Tool.Common.ConsoleIO
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Write(progress.ToString() + " of " + total.ToString() + $" {this.Turn(progress)} "); //blanks at the end remove any excess
             Console.CursorVisible = true;
-            //Console.CursorTop = currTop;
+            Console.CursorTop = currTop;
 
 
         }

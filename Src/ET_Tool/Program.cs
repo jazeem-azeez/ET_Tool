@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.Linq;
+using ET_Tool.Business.DataSink;
 using ET_Tool.Business.DataSourceKinds;
 using ET_Tool.Common.Logger;
 
@@ -23,10 +24,14 @@ namespace ET_Tool
 
             logger.Log("Hello, Serilog!", EventLevel.LogAlways);
             CsvDataSource source = new CsvDataSource(@"E:\ET_Tool\Data\geo_unlocode\code-list.csv", logger);
-            logger.ShowTable("csv", source.Columns.ToArray(), new List<string[]>(), false);
+            CsvDataSink csvDataSink = new CsvDataSink("out.csv", logger, "");
+            csvDataSink.AddHeader(source.GetHeaders());
+
+            //logger.ShowTable("csv", source.Columns.ToArray(), new List<string[]>(), false);
             foreach (List<KeyValuePair<string, string>> item in source.GetDataEntries())
             {
-                logger.ShowRow(item.Select(c => c.Value).ToArray());
+                csvDataSink.AddRow(item.Select(c => c.Value).ToArray());
+                //logger.ShowRow(item.Select(c => c.Value).ToArray());
             }
 
             //Logger.CloseAndFlush();
