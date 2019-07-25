@@ -10,7 +10,7 @@ namespace ET_Tool.Common.Configurations
         public Dictionary<string, string> LookUpInfoSourceUriCollection { get; set; }
 
         /*
-         * format is destination Key : [sequence of {sourceKey1,TransformerActorKey}]
+         * format is destination Key : [sequence of {key,TransformerActorKey}]
          */
         public Dictionary<string, List<KeyValuePair<string, string>>> TransformationSequenceInfo { get; set; }
         public bool AutoDetect { get; set; }

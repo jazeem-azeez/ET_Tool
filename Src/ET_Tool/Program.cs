@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.Tracing;
+using System.Linq;
+using ET_Tool.Business.DataSourceKinds;
 using ET_Tool.Common.Logger;
 
 using Microsoft.Extensions.Configuration;
-using Serilog;
 
 namespace ET_Tool
 {
@@ -11,15 +13,22 @@ namespace ET_Tool
     {
         private static void Main(string[] args)
         {
-           
 
-            var configuration = new ConfigurationBuilder()
+
+            IConfigurationRoot configuration = new ConfigurationBuilder()
           .AddJsonFile("appsettings.json")
           .Build();
 
-            var Logger = new EtLogger(configuration);
+            EtLogger logger = new EtLogger(configuration, new Common.ConsoleIO.ConsoleProgressBar());
 
-            Logger.Log("Hello, Serilog!",EventLevel.LogAlways); 
+            logger.Log("Hello, Serilog!", EventLevel.LogAlways);
+            CsvDataSource source = new CsvDataSource(@"E:\ET_Tool\Data\geo_unlocode\code-list.csv", logger);
+            logger.ShowTable("csv", source.Columns.ToArray(), new List<string[]>(), false);
+            foreach (List<KeyValuePair<string, string>> item in source.GetDataEntries())
+            {
+                logger.ShowRow(item.Select(c => c.Value).ToArray());
+            }
+
             //Logger.CloseAndFlush();
             Console.ReadLine();
             /*

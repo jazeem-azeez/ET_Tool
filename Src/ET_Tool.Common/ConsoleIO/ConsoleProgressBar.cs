@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ET_Tool.Common.ConsoleIO
 {
@@ -9,11 +7,13 @@ namespace ET_Tool.Common.ConsoleIO
         public ConsoleProgressBar()
         {
         }
-        public void DrawTextProgressBar(int progress, int total, int startCursorLeft = 0, int size = 32)
+        public void DrawTextProgressBar(int progress, int total, int level = 0, int startCursorLeft = 0, int size = 32)
         {
             Console.CursorVisible = false;
+            int currTop = Console.CursorTop;
+            Console.CursorTop = Console.LargestWindowHeight - (2*(level+1));
 
-            //draw empty progress bar
+
             int startPos = startCursorLeft + 0;
             Console.CursorLeft = startPos;
             Console.Write("["); //start
@@ -40,12 +40,13 @@ namespace ET_Tool.Common.ConsoleIO
             //draw totals
             Console.CursorLeft = endPos + 8;
             Console.BackgroundColor = ConsoleColor.Black;
-            Console.Write(progress.ToString() + " of " + total.ToString() + $" {Turn(progress)} "); //blanks at the end remove any excess
+            Console.Write(progress.ToString() + " of " + total.ToString() + $" {this.Turn(progress)} "); //blanks at the end remove any excess
             Console.CursorVisible = true;
+            //Console.CursorTop = currTop;
 
 
         }
-        public string Turn(int progress)
+        private string Turn(int progress)
         {
             switch (progress % 5)
             {

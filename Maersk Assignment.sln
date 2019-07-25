@@ -16,16 +16,21 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{0241044E-CEF1-4BA5-9E2D-0DA75A32C86C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{A2B6BFF5-6F56-4E30-AA80-3B96D30B32DD}"
+	ProjectSection(SolutionItems) = preProject
+		Data\geo_unlocode\code-list.csv = Data\geo_unlocode\code-list.csv
+		Data\geo_unlocode\country.txt = Data\geo_unlocode\country.txt
+		Data\geo_unlocode\function_list.txt = Data\geo_unlocode\function_list.txt
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ET_Tool.Business", "Src\ET_Tool.Business\ET_Tool.Business.csproj", "{752A4D86-AEE5-4694-A581-0FBB38E0F597}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ET_Tool.Business", "Src\ET_Tool.Business\ET_Tool.Business.csproj", "{752A4D86-AEE5-4694-A581-0FBB38E0F597}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ET_Tool.Injection", "Src\ET_Tool.Injection\ET_Tool.Injection.csproj", "{13A1F7E5-5B4B-4C83-94E0-93B467201EB7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ET_Tool.Injection", "Src\ET_Tool.Injection\ET_Tool.Injection.csproj", "{13A1F7E5-5B4B-4C83-94E0-93B467201EB7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ET_Tool.Common", "Src\ET_Tool.Common\ET_Tool.Common.csproj", "{E2A405D1-C14A-4932-BA4C-537BB9C827E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ET_Tool.Common", "Src\ET_Tool.Common\ET_Tool.Common.csproj", "{E2A405D1-C14A-4932-BA4C-537BB9C827E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ET_Tool.IO", "Src\ET_Tool.IO\ET_Tool.IO.csproj", "{505E4827-B6F1-4F11-BA1F-77CCFE6AD691}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ET_Tool.IO", "Src\ET_Tool.IO\ET_Tool.IO.csproj", "{505E4827-B6F1-4F11-BA1F-77CCFE6AD691}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ET_Tool.L1.Tests", "Src\Tests\L1\ET_Tool.L1.Tests\ET_Tool.L1.Tests.csproj", "{671AF8C6-BA62-4CE6-BB4E-D2F86A232098}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ET_Tool.L1.Tests", "Src\Tests\L1\ET_Tool.L1.Tests\ET_Tool.L1.Tests.csproj", "{671AF8C6-BA62-4CE6-BB4E-D2F86A232098}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "L0", "L0", "{46D06C79-5814-431F-A7C8-AC5C985D49D9}"
 EndProject
@@ -33,7 +38,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "L1", "L1", "{FA3E3A9B-141A-
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "L2", "L2", "{5C54C778-1FBF-407A-BAB5-0BA8317155F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ET_Tool.L2.Tests", "Src\Tests\L2\ET_Tool.L2.Tests\ET_Tool.L2.Tests.csproj", "{B100449D-E57B-499A-8690-A02B68F8DB48}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ET_Tool.L2.Tests", "Src\Tests\L2\ET_Tool.L2.Tests\ET_Tool.L2.Tests.csproj", "{B100449D-E57B-499A-8690-A02B68F8DB48}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

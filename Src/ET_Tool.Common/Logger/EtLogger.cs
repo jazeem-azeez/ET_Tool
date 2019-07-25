@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.Tracing;
-
+using System.Linq;
+using ET_Tool.Common.ConsoleIO;
 using Microsoft.Extensions.Configuration;
 
+//using Console = Colorful.Console;
 using Serilog;
 
 namespace ET_Tool.Common.Logger
@@ -10,17 +13,19 @@ namespace ET_Tool.Common.Logger
     public class EtLogger : IEtLogger
     {
         private readonly Serilog.Core.Logger _slogger;
+        private readonly ConsoleProgressBar _progressBar;
 
-        public EtLogger(IConfigurationRoot configuration)
+        private const int tableWidth = 100;
+        public EtLogger(IConfigurationRoot configuration, ConsoleProgressBar progressBar)
         {
             LoggerConfiguration loggerConfiguration = new LoggerConfiguration()
             .MinimumLevel.Debug()
-            .WriteTo.ColoredConsole()
-            .WriteTo.File("log.txt",
+            .WriteTo.File("log.txt", restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Debug,
                 rollingInterval: RollingInterval.Hour,
-                rollOnFileSizeLimit: true);
-
-            this._slogger = loggerConfiguration.CreateLogger(); ;
+                rollOnFileSizeLimit: true)
+            .WriteTo.ColoredConsole(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information);
+            this._slogger = loggerConfiguration.CreateLogger();
+            this._progressBar = progressBar;
         }
 
         public void Log(string message, EventLevel eventLevel, Exception exception = null)
@@ -55,5 +60,65 @@ namespace ET_Tool.Common.Logger
                     break;
             }
         }
+
+        public void ProgressBar(int progress, int total, int level = 0) => this._progressBar.DrawTextProgressBar(progress, total, level);
+        private string AlignCentre(string text, int width)
+        {
+            text = text.Length > width ? text.Substring(0, width - 3) + "..." : text;
+
+            if (string.IsNullOrEmpty(text))
+            {
+                return new string(' ', width);
+            }
+            else
+            {
+                return text.PadRight(width - (width - text.Length) / 2).PadLeft(width);
+            }
+        }
+        private string PrintLine(int width = tableWidth)
+        {
+            string temp = new string('-', width);
+            Console.WriteLine(temp);
+            return temp;
+        }
+
+        private string PrintRow(params string[] columns)
+        {
+            if (columns == null || columns.Length == 0)
+            {
+
+                return this.PrintLine();
+            }
+            int width = (tableWidth - columns.Length) / columns.Length;
+            string row = "|";
+
+            foreach (string column in columns)
+            {
+                row += this.AlignCentre(column, width) + "|";
+            }
+
+            Console.WriteLine(row);
+            this.Log(row, EventLevel.Informational);
+            return row;
+        }
+
+        public void ShowTable(string TableName, string[] headers, List<string[]> rows, bool closeAtEnd = true)
+        {
+            this.PrintLine();
+            this.PrintRow(new string[] { TableName });
+            this.PrintLine();
+            this.PrintRow(headers);
+            this.PrintLine();
+
+            foreach (string[] item in rows)
+            {
+                this.PrintRow(item.ToArray());
+            }
+            if (closeAtEnd == true)
+            {
+                this.PrintLine();
+            }
+        }
+        public void ShowRow(string[] rows) => this.PrintRow(rows);
     }
 }

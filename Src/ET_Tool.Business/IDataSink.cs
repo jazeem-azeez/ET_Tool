@@ -1,6 +1,6 @@
 ﻿namespace ET_Tool.Business
 {
-    public interface IIngestActor
+    public interface IDataSink
     {
     }
 }

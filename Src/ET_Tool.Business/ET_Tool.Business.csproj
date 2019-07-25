@@ -12,7 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="EgressActors\" />
+    <Folder Include="Mappers\" />
+    <Folder Include="Filters\" />
+    <Folder Include="DataSink\" />
   </ItemGroup>
 
   <ItemGroup>

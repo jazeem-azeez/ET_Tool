@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ET_Tool.Business\ET_Tool.Business.csproj" />
     <ProjectReference Include="..\ET_Tool.Common\ET_Tool.Common.csproj" />
   </ItemGroup>
 
