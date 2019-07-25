@@ -2,7 +2,7 @@
 
 namespace ET_Tool.Business
 {
-    public interface IET_Actor: IDisposable
+    public interface IET_Engine: IDisposable
     {
         void Run();
         bool Init();

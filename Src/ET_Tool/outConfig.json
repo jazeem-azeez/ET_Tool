@@ -1,0 +1,6 @@
+{
+  "Headers": "Country_code , country_name , Location_code , Location_Name , Location_Type , Longitude , Latitude",
+  "HeaderDelimiterSeparator": "|",
+  "RowDelimiterSeparator": "\t",
+  "AutoMapping": true
+}

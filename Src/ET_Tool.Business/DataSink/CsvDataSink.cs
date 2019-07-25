@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ET_Tool.Business.DataSink.DataSinkKinds;
+﻿using ET_Tool.Business.DataSink.DataSinkKinds;
 using ET_Tool.Common.Logger;
 
 namespace ET_Tool.Business.DataSink
 {
-    public class CsvDataSink : CsvDataSinkKind
+    public class CsvDataSink : CsvDataSinkKind, IDataSink
     {
-        public CsvDataSink(string destFileName, IEtLogger etLogger, string destTemplateConfigurationFile) : base(destFileName, etLogger, destTemplateConfigurationFile)
+        public CsvDataSink(string outputFileName, IEtLogger etLogger, string outConfigurationFile) : base(outputFileName, etLogger, outConfigurationFile)
         {
         }
+
 
     }
 }
