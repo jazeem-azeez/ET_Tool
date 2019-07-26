@@ -1,0 +1,37 @@
+{
+
+  "code-list.csv": {
+    "Country": {
+      "Key": "rename",
+      "Value": "Country_code"
+    },
+    "Location": {
+      "Key": "rename",
+      "Value": "Location_code"
+    },
+    "Name": {
+      "Key": "rename",
+      "Value": "Location_Name"
+    },
+    "Function": {
+      "Key": "rename",
+      "Value": "FunctionCode"
+    }
+  },
+  "country.txt": {
+    "CountryCode": {
+      "Key": "rename",
+      "Value": "Country_code"
+    },
+    "CountryName": {
+      "Key": "rename",
+      "Value": "country_name"
+    }
+  },
+  "function_list.txt": {
+    "FunctionDescription": {
+      "Key": "rename",
+      "Value": "Location_Type"
+    }
+  }
+}

@@ -14,7 +14,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ET_Tool.Common\ET_Tool.Common.csproj" />
-    <ProjectReference Include="..\ET_Tool.IO\ET_Tool.IO.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DataCleaner\DataCleanerKinds\" />
   </ItemGroup>
 
 </Project>

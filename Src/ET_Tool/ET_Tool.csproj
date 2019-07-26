@@ -24,6 +24,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="cleanerConfig.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="outConfig.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

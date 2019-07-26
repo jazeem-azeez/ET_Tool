@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.Tracing;
-using System.Linq;
-using ET_Tool.Business;
-using ET_Tool.Business.DataSink;
-using ET_Tool.Business.DataSourceKinds;
-using ET_Tool.Business.Factories;
-using ET_Tool.Business.Mappers;
+
+using ET_Tool.Common.IO.ConsoleIO;
 using ET_Tool.Common.Logger;
-using ET_Tool.IO;
+
 using Microsoft.Extensions.Configuration;
 
 namespace ET_Tool
@@ -21,13 +16,10 @@ namespace ET_Tool
           .AddJsonFile("appsettings.json")
           .Build();
 
-            EtLogger logger = new EtLogger(configuration, new Common.ConsoleIO.ConsoleProgressBar());
+            EtLogger logger = new EtLogger(configuration, new ConsoleProgressBar());
 
             logger.Log("Hello, Serilog!", EventLevel.LogAlways);
 
-            ET_Engine engine = new ET_Engine(new DataSourceFactory(logger), new DataMapAndFilterHandler(null,null,logger), new DataSinkFactory(logger), logger, new DiskIOHandler(),
-                new RuntimeArgs { AutoDetectDataSources = true, LookUpFilePattern = "*.txt", SourceDataFolder = @"E:\ET_Tool\Data\geo_unlocode\" });
-            engine.Init();
             //CsvDataSource source = new CsvDataSource(@"E:\ET_Tool\Data\geo_unlocode\code-list.csv", logger);
             //CsvDataSink csvDataSink = new CsvDataSink("out.csv", logger, "outConfig.json");
             //csvDataSink.LoadOutpuConfiguration();

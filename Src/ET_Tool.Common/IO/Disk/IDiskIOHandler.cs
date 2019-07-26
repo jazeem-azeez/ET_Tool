@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace ET_Tool.IO
+namespace ET_Tool.Common.IO
 {
     public interface IDiskIOHandler
     {

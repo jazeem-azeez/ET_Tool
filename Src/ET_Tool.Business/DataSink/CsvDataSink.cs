@@ -8,7 +8,5 @@ namespace ET_Tool.Business.DataSink
         public CsvDataSink(string outputFileName, IEtLogger etLogger, string outConfigurationFile) : base(outputFileName, etLogger, outConfigurationFile)
         {
         }
-
-
     }
 }

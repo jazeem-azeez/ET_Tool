@@ -2,11 +2,14 @@
 
 namespace ET_Tool.Business
 {
-    public interface IDataSink:IDisposable
+    public interface IDataSink : IDisposable
     {
-        void LoadOutpuConfiguration();
-        void Initialize();
-        void AddRecordsToSink(string[] values);
         string[] Columns { get; }
+
+        void AddRecordsToSink(string[] values);
+
+        void Initialize();
+
+        void LoadOutpuConfiguration();
     }
 }

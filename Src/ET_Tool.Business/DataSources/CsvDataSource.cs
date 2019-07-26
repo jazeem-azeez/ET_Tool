@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using ET_Tool.Common.Logger;
 
 namespace ET_Tool.Business.DataSourceKinds
 {
     public class CsvDataSource : CsvDataSourceKInd, IDataSource
     {
-        public CsvDataSource(string sourceFileName, IEtLogger logger) : base(sourceFileName, logger) => this.IsDataClean();
+        public CsvDataSource(string sourceFileName, IDataCleaner dataCleaner, IEtLogger logger) : base(sourceFileName, dataCleaner, logger) => this.IsDataClean();
 
-        public string[] GetHeaders() => this.Columns.Select(c => c.Name).ToArray();
-        public bool IsDataClean() => this.Init() && this.Columns != null && this.Columns.Count > 0;
         public IEnumerable<List<KeyValuePair<string, string>>> GetDataRowEntries()
         {
             int fieldCount = this._csvReader.FieldCount;
@@ -24,8 +23,11 @@ namespace ET_Tool.Business.DataSourceKinds
                 }
                 yield return this.BuildRow(row);
             }
-
         }
+
+        public string[] GetHeaders() => this.Columns.Select(c => c.Name).ToArray();
+
+        public bool IsDataClean() => this.Init() && this.Columns != null && this.Columns.Count > 0;
 
         private List<KeyValuePair<string, string>> BuildRow(string[] items)
         {
@@ -38,7 +40,7 @@ namespace ET_Tool.Business.DataSourceKinds
             {
                 result.Add(new KeyValuePair<string, string>(this.Columns[i].Name, items[i]));
             }
-            return result;
+            return _dataCleaner.CleanRow(result);
         }
     }
 }

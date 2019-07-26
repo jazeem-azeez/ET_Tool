@@ -2,6 +2,7 @@
 using System.Data;
 using System.Diagnostics.Tracing;
 using System.Linq;
+
 using ET_Tool.Common.Logger;
 
 namespace ET_Tool.Business.Mappers
@@ -9,9 +10,9 @@ namespace ET_Tool.Business.Mappers
     public class DataLookUpCollection
     {
         private readonly DataTable _dataTable;
+        private readonly Dictionary<string, string> _dictionaryLookup;
         private readonly IEtLogger _logger;
         private readonly bool useDataTable;
-        private readonly Dictionary<string, string> _dictionaryLookup;
 
         public DataLookUpCollection(IDataSource dataSource, IEtLogger logger)
         {
@@ -34,7 +35,6 @@ namespace ET_Tool.Business.Mappers
                 string[] row = item.Select(c => c.Value).ToArray();
                 if (this.useDataTable)
                 {
-
                     this._dataTable.Rows.Add(row);
                 }
                 else
@@ -42,7 +42,6 @@ namespace ET_Tool.Business.Mappers
                     this._dictionaryLookup.Add(row[0], row[1]);
                 }
             }
-
         }
 
         public string[] Columns { get; private set; }
@@ -59,7 +58,6 @@ namespace ET_Tool.Business.Mappers
                 if (row != null && row.Length > 0)
                 {
                     return row[0].ItemArray[index].ToString();
-
                 }
                 this._logger.Log("Value Not found in Lookup", EventLevel.Warning);
                 return string.Empty;
@@ -67,7 +65,6 @@ namespace ET_Tool.Business.Mappers
             this._logger.Log("Column Not found in Lookup", EventLevel.Error);
             return string.Empty;
         }
-
 
         private string DictionaryLookUp(string key)
         {

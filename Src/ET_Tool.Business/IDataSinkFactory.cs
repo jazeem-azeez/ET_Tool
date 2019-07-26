@@ -2,6 +2,6 @@
 {
     public interface IDataSinkFactory
     {
-        IDataSink GetDataSink(string name,string outConfiguration);
+        IDataSink GetDataSink(string name, string outConfiguration);
     }
 }

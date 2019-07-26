@@ -2,22 +2,26 @@
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.IO;
+
 using ET_Tool.Common.Logger;
+
 using LumenWorks.Framework.IO.Csv;
 
 namespace ET_Tool.Business.DataSourceKinds
 {
     public class CsvDataSourceKInd : IDisposable
     {
-        protected CsvReader _csvReader;
         protected readonly IEtLogger _logger;
+        protected readonly IDataCleaner _dataCleaner;
         protected readonly string _sourceFileName;
+        protected CsvReader _csvReader;
         protected StreamReader _streamReader;
 
-        public CsvDataSourceKInd(string sourceFileName, IEtLogger logger)
+        public CsvDataSourceKInd(string sourceFileName, IDataCleaner dataCleaner, IEtLogger logger)
         {
             this._sourceFileName = sourceFileName;
             this._logger = logger;
+            this._dataCleaner = dataCleaner;
             this.Columns = new List<Column>();
         }
 
@@ -29,15 +33,6 @@ namespace ET_Tool.Business.DataSourceKinds
             this._streamReader.Dispose();
         }
 
-        private void Csv_ParseError(object sender, ParseErrorEventArgs e)
-        {
-            // if the error is that a field is missing, then skip to next line
-            if (e.Error is MissingFieldCsvException)
-            {
-                this._logger.Log($"--MISSING FIELD ERROR OCCURRED, on {e.Error.CurrentRecordIndex}", EventLevel.Error);
-                e.Action = ParseErrorAction.AdvanceToNextLine;
-            }
-        }
         public bool Init()
         {
             this._logger.Log($"Preparing to Load Headers from {this._sourceFileName}", EventLevel.LogAlways);
@@ -52,7 +47,7 @@ namespace ET_Tool.Business.DataSourceKinds
             }
             );
             this._streamReader = new StreamReader(this._sourceFileName);
-            this._csvReader = new CsvReader(this._streamReader,true)
+            this._csvReader = new CsvReader(this._streamReader, true)
             {
                 DefaultParseErrorAction = ParseErrorAction.RaiseEvent
             };
@@ -60,17 +55,20 @@ namespace ET_Tool.Business.DataSourceKinds
             this._csvReader.ParseError += this.Csv_ParseError;
             this._csvReader.ReadNextRecord();
             this.Columns.AddRange(this._csvReader.Columns);
-
-
+            this._dataCleaner.CleanHeader(this.Columns);
             this._logger.Log($"Loaded file Headers from {this._sourceFileName}", EventLevel.LogAlways);
 
             return true;
         }
 
-      
-
-
-
-
+        private void Csv_ParseError(object sender, ParseErrorEventArgs e)
+        {
+            // if the error is that a field is missing, then skip to next line
+            if (e.Error is MissingFieldCsvException)
+            {
+                this._logger.Log($"--MISSING FIELD ERROR OCCURRED, on {e.Error.CurrentRecordIndex}", EventLevel.Error);
+                e.Action = ParseErrorAction.AdvanceToNextLine;
+            }
+        }
     }
 }

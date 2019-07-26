@@ -11,7 +11,6 @@ namespace ET_Tool.Business.DataSink.DataSinkKinds
 {
     public class CsvDataSinkKind : IDisposable
     {
-        private const string headersKey = "Headers";
         protected readonly string _destFileName;
 
         //protected CsvWriter _csvWriter;
@@ -20,6 +19,7 @@ namespace ET_Tool.Business.DataSink.DataSinkKinds
         protected StreamWriter _streamWriter;
         protected string HeaderDelimiterSeparator;
         protected string RowDelimiterSeparator;
+        private const string headersKey = "Headers";
         private readonly string _destTemplateConfigurationFile;
 
         public CsvDataSinkKind(string destFileName, IEtLogger etLogger, string destTemplateConfigurationFile)
@@ -27,23 +27,14 @@ namespace ET_Tool.Business.DataSink.DataSinkKinds
             this._destFileName = destFileName;
             this._logger = etLogger;
             this._destTemplateConfigurationFile = destTemplateConfigurationFile;
-
         }
 
+        public string[] Columns { get; private set; }
         public Dictionary<string, string> OutInfo { get; private set; }
-
-        private bool AddHeader(string[] header)
-        {
-            this._streamWriter.WriteLine(string.Join(',', header));
-            return true;
-        }
-
 
         public void AddRecordsToSink(string[] row) => this._streamWriter.WriteLine(string.Join(',', row));
 
         public void Dispose() => this._streamWriter.Dispose();
-
-        public string[] Columns { get; private set; }
 
         public void Initialize()
         {
@@ -63,6 +54,12 @@ namespace ET_Tool.Business.DataSink.DataSinkKinds
             }
             this.RowDelimiterSeparator = this.OutInfo[nameof(this.RowDelimiterSeparator)];
             this.HeaderDelimiterSeparator = this.OutInfo[nameof(this.HeaderDelimiterSeparator)];
+        }
+
+        private bool AddHeader(string[] header)
+        {
+            this._streamWriter.WriteLine(string.Join(',', header));
+            return true;
         }
     }
 }
