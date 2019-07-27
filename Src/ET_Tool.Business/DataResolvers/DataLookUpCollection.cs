@@ -71,7 +71,7 @@ namespace ET_Tool.Business.Mappers
         {
             if (this._dictionaryLookup.ContainsKey(key) == false)
             {
-                this._logger.Log("Value Not found in Lookup", EventLevel.Warning);
+                this._logger.Log($"Value for {key} Not found in Lookup", EventLevel.Warning);
                 return string.Empty;
             }
             else

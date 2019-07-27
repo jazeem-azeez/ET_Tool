@@ -33,6 +33,7 @@ namespace ET_Tool.Business
             this._logger = logger;
             this._diskIOHandler = diskIOHandler;
             this._runtimeSettings = runtimeSettings;
+            _toSinkDataChainBuilder = new SourceToSinkDataChainBuilder(logger);
         }
 
         public void Dispose() => throw new NotImplementedException();

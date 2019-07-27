@@ -21,11 +21,12 @@ namespace ET_Tool.Business.DataCleaner
 
         public Dictionary<string, KeyValuePair<string, string>> GetCleanConfigForSource(string attachedSourceName,string part)
         {
-            if (this._cleanerConfigs.ContainsKey($"{attachedSourceName}-{ part}") == false)
+            string key = $"{attachedSourceName}-{ part}";
+            if (this._cleanerConfigs.ContainsKey(key) == false)
             {
                 return new Dictionary<string, KeyValuePair<string, string>>();
             }
-            return this._cleanerConfigs[attachedSourceName];
+            return this._cleanerConfigs[key];
         }
         public Dictionary<string, KeyValuePair<string, string>> GetRowCleanConfigForSource(string attachedSourceName) => GetCleanConfigForSource(attachedSourceName, "row");
         public Dictionary<string, KeyValuePair<string, string>> GetHeaderCleanConfigForSource(string attachedSourceName) => GetCleanConfigForSource(attachedSourceName, "header");

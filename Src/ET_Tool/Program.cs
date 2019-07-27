@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
-using CoordinateSharp;
 using ET_Tool.Business;
+using ET_Tool.Business.DataCleaner;
 using ET_Tool.Business.Factories;
 using ET_Tool.Business.Mappers;
 using ET_Tool.Business.Mappers.Transformation;
@@ -31,22 +31,24 @@ namespace ET_Tool
             RuntimeArgs runtimeSettings = new RuntimeArgs()
             {
                 AutoBuild = true,
-                DataSinkFileName= @"E:\ET_Tool\Data\geo_unlocode\out.csv",
-                DataSourceFileName= @"E:\ET_Tool\Data\geo_unlocode\code-list.csv",
-                DegreeToDecimalLatLongMapperSettings= new Dictionary<string, string>
+                DataSinkFileName = @"E:\ET_Tool\Data\geo_unlocode\out.csv",
+                DataSourceFileName = @"E:\ET_Tool\Data\geo_unlocode\code-list.csv",
+                DegreeToDecimalLatLongMapperSettings = new Dictionary<string, string>
                 {
                     { Constants.columnkey, "Coordinates" },
                     { Constants.latitudeKey, "Latitude" },
                     { Constants.longitudeKey, "Longitude" }
                 },
-                LookUpFilePattern="*.txt",
-                OutConfigFileName="outConfig.json",
-                SourceDataFolder="data"
-                
+                LookUpFilePattern = "*.txt",
+                OutConfigFileName = "outConfig.json",
+                SourceDataFolder = @"E:\ET_Tool\Data\geo_unlocode\",
+                DefaultCleanerConfig ="cleanerConfig.json"
+
             };
             diskIOHandler.FileWriteAllText("runtimeConfig.Json", JsonConvert.SerializeObject(runtimeSettings));
-            IDataCleanerFactory cleanerFactory = new DataCleanerFactory;
-            IDataSourceFactory dataSourceFactory = new DataSourceFactory(logger,cleanerFactory); 
+            IDataCleanerConfig cleanerConfig = new DataCleanerConfig(runtimeSettings.DefaultCleanerConfig, diskIOHandler);
+            IDataCleanerFactory cleanerFactory = new DataCleanerFactory(cleanerConfig);
+            IDataSourceFactory dataSourceFactory = new DataSourceFactory(logger, cleanerFactory);
             IDataSinkFactory dataSinkFactory = new DataSinkFactory(logger);
             DegreeToDecimalLatLongMapper degreeToDecimalLatLongMapper = new DegreeToDecimalLatLongMapper(runtimeSettings);
             Dictionary<string, IDataMapper> dataMappers = new Dictionary<string, IDataMapper>() { { degreeToDecimalLatLongMapper.Name, degreeToDecimalLatLongMapper } };
@@ -55,7 +57,7 @@ namespace ET_Tool
             ET_Engine engine = new ET_Engine(dataSourceFactory, dataResolver, dataSinkFactory, logger, diskIOHandler, runtimeSettings);
             engine.Init();
             engine.Run();
-           
+
 
             //logger.ShowTable("csv", source.Columns.ToArray(), new List<string[]>(), false);
             //foreach (List<KeyValuePair<string, string>> item in source.GetDataRowEntries())
@@ -65,6 +67,7 @@ namespace ET_Tool
             //}
 
             //Logger.CloseAndFlush();
+
             Console.ReadLine();
             /*
              * 1. Load Configurations

@@ -27,6 +27,7 @@ namespace ET_Tool.Business.DataSink.DataSinkKinds
             this._destFileName = destFileName;
             this._logger = etLogger;
             this._destTemplateConfigurationFile = destTemplateConfigurationFile;
+            this.Initialize();
         }
 
         public string[] Columns { get; private set; }
@@ -34,7 +35,7 @@ namespace ET_Tool.Business.DataSink.DataSinkKinds
 
         public void AddRecordsToSink(string[] row) => this._streamWriter.WriteLine(string.Join(',', row));
 
-        public void AddRecordsToSink(List<DataCell> cells) => AddRecordsToSink(cells.Select(c => c.Value).ToArray());
+        public void AddRecordsToSink(List<DataCell> cells) => this.AddRecordsToSink(cells.Select(c => c.Value).ToArray());
         public void Dispose() => this._streamWriter.Dispose();
 
         public void Initialize()

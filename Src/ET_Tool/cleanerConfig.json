@@ -31,7 +31,7 @@
     },
     "CountryName": {
       "Key": "rename",
-      "Value": "country_name"
+      "Value": "Country_name"
     }
   },
   "function_list.txt-header": {

@@ -90,7 +90,7 @@ namespace ET_Tool.Business.Mappers
         {
 
             string currVal = string.Empty;
-
+             
             foreach (KeyValuePair<string, string> item in steps)
             {
 
@@ -108,7 +108,8 @@ namespace ET_Tool.Business.Mappers
                     {
                         if (item.Value == SourceRow.Cells[i].Column.Name)
                         {
-                            currVal = SourceRow.Cells[i].Column.Name;
+                            currVal = SourceRow.Cells[i].Value;
+
                             break;
                         }
                     }
@@ -117,12 +118,12 @@ namespace ET_Tool.Business.Mappers
                 {
                     currVal = this._globalLookUpCollection[item.Key].LookUp(item.Key, item.Value, currVal);
                 }
-                if (currentColumn.Name == item.Key)
-                {
-                    outRowCollection.Cells.Add(new DataCell(new Column { Name = item.Key }, "", currVal));
-                }
+                //if (currentColumn.Name == item.Value)
+                //{
+                //    outRowCollection.Cells.Add(new DataCell(new Column { Name = item.Key }, "", currVal));
+                //}
             }
-
+            outRowCollection.Cells.Add(new DataCell(new Column { Name = currentColumn.Name }, "", currVal));
 
             return outRowCollection;
         }
