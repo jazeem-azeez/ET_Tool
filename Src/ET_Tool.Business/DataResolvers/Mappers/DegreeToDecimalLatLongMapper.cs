@@ -5,11 +5,9 @@ using ET_Tool.Common.Models;
 
 namespace ET_Tool.Business.Mappers.Transformation
 {
-    internal class DegreeToDecimalLatLongMapper : IDataMapper
+    public class DegreeToDecimalLatLongMapper : IDataMapper
     {
-        private const string columnkey = "ColumnKey";
-        private const string latitudeKey = "LatitudeKey";
-        private const string longitudeKey = "LongitudeKey";
+
         private readonly RuntimeArgs _runtimeArgs;
 
         public DegreeToDecimalLatLongMapper(RuntimeArgs runtimeArgs) => this._runtimeArgs = runtimeArgs;
@@ -28,12 +26,6 @@ namespace ET_Tool.Business.Mappers.Transformation
             point = Regex.Replace(point, "[^0-9.]", "");
             string mins = point.Substring(point.Length - 2, 2);
             string degs = point.Substring(0, point.Length - 2);
-            // var pointArray = point.Split('.'); //split the string.
-
-            //Decimal degrees =
-            //   whole number of degrees,
-            //   plus minutes divided by 60,
-            //   plus seconds divided by 3600
 
             double degrees = double.Parse(degs);
             double minutes = double.Parse(mins) / 60;
@@ -44,23 +36,23 @@ namespace ET_Tool.Business.Mappers.Transformation
         public HashSet<string> GetAssociatedColumns() => new HashSet<string>(
             new string[]
   {
-              this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[nameof(columnkey)],
-              this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[nameof(latitudeKey)],
-              this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[nameof(longitudeKey)],
+              this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.columnkey],
+              this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.latitudeKey],
+              this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.longitudeKey],
   });
 
         public List<KeyValuePair<string, string>> Map(string columnkey,
             string value,
             List<KeyValuePair<string, string>> mappingContextValues,
-            List<KeyValuePair<string, string>> resultList)
+            List<KeyValuePair<string, string>> currentState)
         {
             if (
-                columnkey != this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[nameof(columnkey)] ||
-                resultList.Exists(item => item.Key == this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[latitudeKey]) ||
-                resultList.Exists(item => item.Key == this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[longitudeKey])
+                columnkey != this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.columnkey] ||
+                currentState.Exists(item => item.Key == this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.latitudeKey]) ||
+                currentState.Exists(item => item.Key == this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.longitudeKey])
                 )
             {
-                return resultList;
+                return currentState;
             }
 
             List<KeyValuePair<string, string>> temp = new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>(columnkey, value), new KeyValuePair<string, string>(columnkey + 1, value) };
@@ -70,9 +62,9 @@ namespace ET_Tool.Business.Mappers.Transformation
         public DataCellCollection Map(string columnkey, string value, Dictionary<string, string> Context, DataCellCollection currentState)
         {
             if (
-              columnkey != this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[nameof(columnkey)] ||
-              currentState.Cells.Exists(item => item.Column.Name == this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[latitudeKey]) ||
-              currentState.Cells.Exists(item => item.Column.Name == this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[longitudeKey])
+              columnkey != this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.columnkey] ||
+              currentState.Cells.Exists(item => item.Column.Name == this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.latitudeKey]) ||
+              currentState.Cells.Exists(item => item.Column.Name == this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.longitudeKey])
               )
             {
                 return currentState;
@@ -87,8 +79,8 @@ namespace ET_Tool.Business.Mappers.Transformation
             double latitude = latlong[0].Contains('N') || latlong[0].Contains('S') ? this.ConvertDegreeAngleToDouble(latlong[0]) : this.ConvertDegreeAngleToDouble(latlong[1]);
             double longitude = latlong[0].Contains('E') || latlong[0].Contains('W') ? this.ConvertDegreeAngleToDouble(latlong[0]) : this.ConvertDegreeAngleToDouble(latlong[1]);
 
-            currentState.Add(new DataCell(new LumenWorks.Framework.IO.Csv.Column() { Name = this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[latitudeKey] }, "", latitude.ToString()));
-            currentState.Add(new DataCell(new LumenWorks.Framework.IO.Csv.Column() { Name = this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[longitudeKey] }, "", longitude.ToString()));
+            currentState.Add(new DataCell(new LumenWorks.Framework.IO.Csv.Column() { Name = this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.latitudeKey] }, "", latitude.ToString()));
+            currentState.Add(new DataCell(new LumenWorks.Framework.IO.Csv.Column() { Name = this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.longitudeKey] }, "", longitude.ToString()));
 
             return currentState;
         }

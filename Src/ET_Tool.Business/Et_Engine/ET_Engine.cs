@@ -21,14 +21,14 @@ namespace ET_Tool.Business
         private readonly SourceToSinkDataChainBuilder _toSinkDataChainBuilder;
 
         public ET_Engine(IDataSourceFactory dataSourceFactory,
-                        IDataResolver dataMapHandler,
+                        IDataResolver dataResolver,
                         IDataSinkFactory dataSinkFactory,
                         IEtLogger logger,
                         IDiskIOHandler diskIOHandler,
                         RuntimeArgs runtimeSettings)
         {
             this._dataSourceFactory = dataSourceFactory;
-            this._dataMapHandler = dataMapHandler;
+            this._dataMapHandler = dataResolver;
             this._dataSinkFactory = dataSinkFactory;
             this._logger = logger;
             this._diskIOHandler = diskIOHandler;
