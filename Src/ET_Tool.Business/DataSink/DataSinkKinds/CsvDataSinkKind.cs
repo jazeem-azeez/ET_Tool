@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.IO;
-
+using System.Linq;
 using ET_Tool.Common.Logger;
-
+using ET_Tool.Common.Models;
 using Newtonsoft.Json;
 
 namespace ET_Tool.Business.DataSink.DataSinkKinds
@@ -34,6 +34,7 @@ namespace ET_Tool.Business.DataSink.DataSinkKinds
 
         public void AddRecordsToSink(string[] row) => this._streamWriter.WriteLine(string.Join(',', row));
 
+        public void AddRecordsToSink(List<DataCell> cells) => AddRecordsToSink(cells.Select(c => c.Value).ToArray());
         public void Dispose() => this._streamWriter.Dispose();
 
         public void Initialize()

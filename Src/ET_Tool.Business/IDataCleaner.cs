@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ET_Tool.Common.Models;
 using LumenWorks.Framework.IO.Csv;
 
 namespace ET_Tool.Business
@@ -6,6 +7,6 @@ namespace ET_Tool.Business
     public interface IDataCleaner
     { 
         void CleanHeader(List<Column> columns);
-        List<KeyValuePair<string, string>> CleanRow(List<KeyValuePair<string, string>> result);
+        DataCellCollection CleanRow(DataCellCollection result);
     }
 }

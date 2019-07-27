@@ -5,6 +5,8 @@ using System.IO;
 using ET_Tool.Business.Mappers;
 using ET_Tool.Common.IO;
 using ET_Tool.Common.Logger;
+using ET_Tool.Common.Models;
+using LumenWorks.Framework.IO.Csv;
 
 namespace ET_Tool.Business
 {
@@ -50,7 +52,7 @@ namespace ET_Tool.Business
                         this._dataMapHandler.AddNewDataLookUp(key, lookUpCollection);
                     }
                 }
-                foreach (var item in _dataMapHandler.GetAllMappers())
+                foreach (IDataMapper item in this._dataMapHandler.GetAllMappers())
                 {
                     this._toSinkDataChainBuilder.LookUps.Add(item.Name, item.GetAssociatedColumns());
                 }
@@ -73,6 +75,29 @@ namespace ET_Tool.Business
 
         public void Run()
         {
+            using (IDataSource dataSource = this._dataSourceFactory.GetDataSource(this._runtimeSettings.DataSourceFileName))
+            {
+                using (IDataSink dataSink = this._dataSinkFactory.GetDataSink(this._runtimeSettings.DataSinkFileName, this._runtimeSettings.OutConfigFileName))
+                {
+                    string[] rowValues = new string[dataSink.Columns.Length];
+                    Dictionary<string, string> context = new Dictionary<string, string>();
+                    foreach (DataCellCollection row in dataSource.GetDataRowEntries())
+                    {
+                        DataCellCollection outRowCollection = new DataCellCollection();
+                        for (int i = 0; i < dataSink.Columns.Length; i++)
+                        {
+                            Dictionary<string, string> steps = this._toSinkDataChainBuilder.GetSteps(dataSink.Columns[i]);
+
+                            outRowCollection = this._dataMapHandler.Resolve(row, new Column() { Name = dataSink.Columns[i] }, outRowCollection, steps, context);
+
+                        }
+
+                        dataSink.AddRecordsToSink(outRowCollection.Cells);
+                    }
+                }
+            }
         }
+
+
     }
 }

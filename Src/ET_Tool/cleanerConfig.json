@@ -1,6 +1,6 @@
 {
 
-  "code-list.csv": {
+  "code-list.csv-header": {
     "Country": {
       "Key": "rename",
       "Value": "Country_code"
@@ -18,7 +18,13 @@
       "Value": "FunctionCode"
     }
   },
-  "country.txt": {
+  "code-list.csv-row": {
+    "Function": {
+      "Key": "remove-symbols",
+      "Value": "-"
+    }
+  },
+  "country.txt-header": {
     "CountryCode": {
       "Key": "rename",
       "Value": "Country_code"
@@ -28,7 +34,7 @@
       "Value": "country_name"
     }
   },
-  "function_list.txt": {
+  "function_list.txt-header": {
     "FunctionDescription": {
       "Key": "rename",
       "Value": "Location_Type"

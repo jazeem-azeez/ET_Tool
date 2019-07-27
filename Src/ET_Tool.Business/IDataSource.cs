@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using ET_Tool.Common.Models;
 
 namespace ET_Tool.Business
 {
     public interface IDataSource : IDisposable
     {
-        IEnumerable<List<KeyValuePair<string, string>>> GetDataRowEntries();
+        IEnumerable<DataCellCollection> GetDataRowEntries();
 
         string[] GetHeaders();
 

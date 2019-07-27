@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using ET_Tool.Common.Models;
 
 namespace ET_Tool.Business
 {
@@ -11,5 +13,6 @@ namespace ET_Tool.Business
         void Initialize();
 
         void LoadOutpuConfiguration();
+        void AddRecordsToSink(List<DataCell> cells);
     }
 }

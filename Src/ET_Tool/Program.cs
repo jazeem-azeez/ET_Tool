@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics.Tracing;
-
+using CoordinateSharp;
 using ET_Tool.Common.IO.ConsoleIO;
 using ET_Tool.Common.Logger;
 
@@ -20,6 +20,9 @@ namespace ET_Tool
 
             logger.Log("Hello, Serilog!", EventLevel.LogAlways);
 
+            string point = "4005";
+
+            //Console.WriteLine(coordinate); //N 32º 53' 28.212" W 64º 52' 20.914"
             //CsvDataSource source = new CsvDataSource(@"E:\ET_Tool\Data\geo_unlocode\code-list.csv", logger);
             //CsvDataSink csvDataSink = new CsvDataSink("out.csv", logger, "outConfig.json");
             //csvDataSink.LoadOutpuConfiguration();

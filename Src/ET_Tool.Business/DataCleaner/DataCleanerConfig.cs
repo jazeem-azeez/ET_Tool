@@ -19,13 +19,15 @@ namespace ET_Tool.Business.DataCleaner
             this._cleanerConfigs = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, KeyValuePair<string, string>>>>(this._iOHandler.FileReadAllText(this._cleanerConfigFileName));
         }
 
-        public Dictionary<string, KeyValuePair<string, string>> GetHeaderCleanConfigForSource(string attachedSourceName)
+        public Dictionary<string, KeyValuePair<string, string>> GetCleanConfigForSource(string attachedSourceName,string part)
         {
-            if (this._cleanerConfigs.ContainsKey(attachedSourceName) == false)
+            if (this._cleanerConfigs.ContainsKey($"{attachedSourceName}-{ part}") == false)
             {
                 return new Dictionary<string, KeyValuePair<string, string>>();
             }
             return this._cleanerConfigs[attachedSourceName];
         }
+        public Dictionary<string, KeyValuePair<string, string>> GetRowCleanConfigForSource(string attachedSourceName) => GetCleanConfigForSource(attachedSourceName, "row");
+        public Dictionary<string, KeyValuePair<string, string>> GetHeaderCleanConfigForSource(string attachedSourceName) => GetCleanConfigForSource(attachedSourceName, "header");
     }
 }

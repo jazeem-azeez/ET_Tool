@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 
 using ET_Tool.Common.Logger;
+using ET_Tool.Common.Models;
+using LumenWorks.Framework.IO.Csv;
 
 namespace ET_Tool.Business.Mappers
 {
@@ -32,7 +34,7 @@ namespace ET_Tool.Business.Mappers
 
         public void AddNewDataLookUp(string key, DataLookUpCollection lookUpCollection) => this._globalLookUpCollection.Add(key, lookUpCollection);
 
-        public void AddNewDataMapRule(string key, List<string> mappers) => this._mappingRulesCollection.Add(key, mappers);
+
 
         //public List<KeyValuePair<string, string>> FilterDataFor(string columnkey, string value, List<KeyValuePair<string, string>> mappingContextValues)
         //{
@@ -82,6 +84,47 @@ namespace ET_Tool.Business.Mappers
                 this._logger.Log("Missing or Invalid Mapper", EventLevel.Error, exception);
                 throw exception;
             }
+        }
+
+        public DataCellCollection Resolve(DataCellCollection SourceRow, Column currentColumn, DataCellCollection outRowCollection, Dictionary<string, string> steps, Dictionary<string, string> context)
+        {
+
+            string currVal = string.Empty;
+
+            foreach (KeyValuePair<string, string> item in steps)
+            {
+
+                if (this._dataMappers.ContainsKey(item.Key))
+                {
+                    outRowCollection = this._dataMappers[item.Key].Map(currentColumn.Name, currVal, context, SourceRow);
+                    continue;
+                }
+
+
+                //TODOD move to constants
+                if (item.Key == "Source")
+                {
+                    for (int i = 0; i < SourceRow.Cells.Count; i++)
+                    {
+                        if (item.Value == SourceRow.Cells[i].Column.Name)
+                        {
+                            currVal = SourceRow.Cells[i].Column.Name;
+                            break;
+                        }
+                    }
+                }
+                if (this._globalLookUpCollection.ContainsKey(item.Key))
+                {
+                    currVal = this._globalLookUpCollection[item.Key].LookUp(item.Key, item.Value, currVal);
+                }
+                if (currentColumn.Name == item.Key)
+                {
+                    outRowCollection.Cells.Add(new DataCell(new Column { Name = item.Key }, "", currVal));
+                }
+            }
+
+
+            return outRowCollection;
         }
     }
 }
