@@ -90,19 +90,21 @@ namespace ET_Tool.Business.Mappers
         {
 
             string currVal = string.Empty;
-             
+
             foreach (KeyValuePair<string, string> item in steps)
             {
 
+
                 if (this._dataMappers.ContainsKey(item.Key))
                 {
-                    outRowCollection = this._dataMappers[item.Key].Map(currentColumn.Name, currVal, context, SourceRow);
-                    continue;
+
+                    outRowCollection = this._dataMappers[item.Key].Map(currentColumn.Name, currVal, context, SourceRow); 
+
                 }
 
 
                 //TODOD move to constants
-                if (item.Key == "Source")
+                if (item.Key == Constants.SourceColKey)
                 {
                     for (int i = 0; i < SourceRow.Cells.Count; i++)
                     {
@@ -116,6 +118,18 @@ namespace ET_Tool.Business.Mappers
                 }
                 if (this._globalLookUpCollection.ContainsKey(item.Key))
                 {
+                    if (_mappingRulesCollection.ContainsKey(item.Key))
+                    {
+                        foreach (var mappingRule in _mappingRulesCollection[item.Key])
+                        {
+                            switch (mappingRule)
+                            {
+                                case "column-is-csv-lookup":
+                                default:
+                                    break;
+                            }
+                        }
+                    }
                     currVal = this._globalLookUpCollection[item.Key].LookUp(item.Key, item.Value, currVal);
                 }
                 //if (currentColumn.Name == item.Value)

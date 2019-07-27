@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+
 using ET_Tool.Common.Models;
+
 using LumenWorks.Framework.IO.Csv;
 
 namespace ET_Tool.Business.DataCleaner
@@ -16,9 +18,10 @@ namespace ET_Tool.Business.DataCleaner
         {
             this._attachedSourceName = attachedSourceName;
             this._dataCleanerConfig = dataCleanerConfig;
-            this.headerCleanCfg = this._dataCleanerConfig.GetHeaderCleanConfigForSource(Path.GetFileName( this._attachedSourceName));
+            this.headerCleanCfg = this._dataCleanerConfig.GetHeaderCleanConfigForSource(Path.GetFileName(this._attachedSourceName));
             this.rowCleanCfg = this._dataCleanerConfig.GetRowCleanConfigForSource(Path.GetFileName(this._attachedSourceName));
         }
+
         public void CleanHeader(List<Column> columns)
         {
             if (this.headerCleanCfg.Count > 0)
@@ -39,6 +42,7 @@ namespace ET_Tool.Business.DataCleaner
                                 }
                                 item.Name = newName;
                                 break;
+
                             default:
                                 break;
                         }
@@ -46,11 +50,12 @@ namespace ET_Tool.Business.DataCleaner
                 }
             }
         }
+
         public DataCellCollection CleanRow(DataCellCollection result)
         {
             if (this.rowCleanCfg.Count > 0)
             {
-                foreach (var item in result.Cells)
+                foreach (DataCell item in result.Cells)
                 {
                     if (this.rowCleanCfg.ContainsKey(item.Column.Name))
                     {
@@ -64,6 +69,13 @@ namespace ET_Tool.Business.DataCleaner
                                     item.Value = item.Value.Replace(symbols[i], "");
                                 }
                                 break;
+
+                            case "replace-symbols":
+                                symbols = this.rowCleanCfg[colName].Value.Split(' ');
+                                item.Value = item.Value.Replace(symbols[0], symbols[1]);
+
+                                break;
+
                             default: break;
                         }
                     }
