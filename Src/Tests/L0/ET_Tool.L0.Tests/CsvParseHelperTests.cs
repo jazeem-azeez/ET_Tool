@@ -34,17 +34,27 @@ namespace ET_Tool.L0.Tests
         [TestMethod]
         public void GetFields_StateUnderTest_ExpectedBehavior()
         {
-            // Arrange
-            var csvParseHelper = this.CreateCsvParseHelper();
-            string line = @",AT,MA5,Maria Alm am Steinernen Meer,Maria Alm am Steinernen Meer,5,RL,--3-----,1601,,4724N 01254E,";
-           
+            // Arrange 
+            string line = ",AT,MLD,\"Mollersdorf, Baden\",\"Mollersdorf, Baden\",3,RL,--3-----,1301,,4801N 01618E,";
+
 
             // Act
-            var result = csvParseHelper.GetFields(
+            var result = CsvParseHelper.GetAllFields(
                 line);
-
             // Assert
             Assert.IsTrue(result.Length==12);
+            // Arrange 
+            line = "FunctionCode,FunctionDescription";
+
+
+            // Act
+            result = CsvParseHelper.GetAllFields(
+                line);
+            // Assert
+
+            Assert.IsTrue(result.Length == 2);
+
+
         }
 
         //[TestMethod]

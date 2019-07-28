@@ -42,7 +42,7 @@ namespace ET_Tool
                 LookUpFilePattern = "*.txt",
                 OutConfigFileName = "outConfig.json",
                 SourceDataFolder = @"E:\ET_Tool\Data\geo_unlocode\",
-                DefaultCleanerConfig ="cleanerConfig.json",
+                DefaultCleanerConfig = "cleanerConfig.json",
                 MappingRulesSourcePath = "mappingRules.json"
 
             };
@@ -57,9 +57,13 @@ namespace ET_Tool
             IDataResolver dataResolver = new DataResolver(dataMappers, dataFilter, logger);
             ET_Engine engine = new ET_Engine(dataSourceFactory, dataResolver, dataSinkFactory, logger, diskIOHandler, runtimeSettings);
 
-            engine.Init();
-            engine.RunDataAnalysis();
-            engine.PerformTransformation();
+
+
+            if (engine.RunDataAnalysis() && engine.InitializePrepocessing())
+            {
+                engine.PerformTransformation();
+            }
+
 
 
             //logger.ShowTable("csv", source.Columns.ToArray(), new List<string[]>(), false);
@@ -93,6 +97,7 @@ namespace ET_Tool
              * 5. CheckSum Output , Input
              *
              */
+
         }
     }
 }

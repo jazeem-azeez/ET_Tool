@@ -20,8 +20,13 @@ namespace ET_Tool.Business.Mappers.Transformation
             // NOP method
         }
 
-        public double ConvertDegreeAngleToDouble(string point)
+        public string ConvertDegreeAngleToDouble(string point)
         {
+            if (string.IsNullOrEmpty(point) || point.Length < 3)
+            {
+                return string.Empty;
+            }
+
             int multiplier = (point.Contains("S") || point.Contains("W")) ? -1 : 1; //handle south and west
 
             point = Regex.Replace(point, "[^0-9.]", "");
@@ -31,7 +36,7 @@ namespace ET_Tool.Business.Mappers.Transformation
             double degrees = double.Parse(degs);
             double minutes = double.Parse(mins) / 60;
 
-            return (degrees + minutes) * multiplier;
+            return ((degrees + minutes) * multiplier).ToString();
         }
 
         public HashSet<string> GetAssociatedColumns() => new HashSet<string>(
@@ -55,8 +60,8 @@ namespace ET_Tool.Business.Mappers.Transformation
                 return result;
             }
 
-            double latitude = latlong[0].Contains('N') || latlong[0].Contains('S') ? this.ConvertDegreeAngleToDouble(latlong[0]) : this.ConvertDegreeAngleToDouble(latlong[1]);
-            double longitude = latlong[0].Contains('E') || latlong[0].Contains('W') ? this.ConvertDegreeAngleToDouble(latlong[0]) : this.ConvertDegreeAngleToDouble(latlong[1]);
+            string latitude = latlong[0].Contains('N') || latlong[0].Contains('S') ? this.ConvertDegreeAngleToDouble(latlong[0]) : this.ConvertDegreeAngleToDouble(latlong[1]);
+            string longitude = latlong[0].Contains('E') || latlong[0].Contains('W') ? this.ConvertDegreeAngleToDouble(latlong[0]) : this.ConvertDegreeAngleToDouble(latlong[1]);
             if (columnkey == this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.latitudeKey])
             {
                 result.Add(new DataCell(new LumenWorks.Framework.IO.Csv.Column() { Name = this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.latitudeKey] }, "", latitude.ToString()));

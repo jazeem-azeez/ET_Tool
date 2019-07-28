@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.Linq;
 
+using ET_Tool.Common;
 using ET_Tool.Common.Logger;
 using ET_Tool.Common.Models;
 
@@ -13,16 +15,9 @@ namespace ET_Tool.Business.DataSourceKinds
 
         public IEnumerable<DataCellCollection> GetDataRowEntries()
         {
-            int fieldCount = this._csvReader.FieldCount;
-            string[] row = new string[fieldCount];
-
-            while (this._csvReader.ReadNextRecord())
+            while (this._streamReader.EndOfStream == false)
             {
-                for (int i = 0; i < fieldCount; i++)
-                {
-                    row[i] = this._csvReader[i];
-                }
-                yield return this.BuildRow(row);
+                yield return this.BuildRow(CsvParseHelper.GetAllFields(this._streamReader.ReadLine()));
             }
         }
 
@@ -32,16 +27,18 @@ namespace ET_Tool.Business.DataSourceKinds
 
         private DataCellCollection BuildRow(string[] items)
         {
+
+            DataCellCollection row = new DataCellCollection();
             if (items.Length != this.Columns.Count)
             {
-                throw new DataMisalignedException("Columns & Values are not same");
+                this._logger.Log($"Columns & Values are not same {string.Join(",",items) }", EventLevel.Error, new DataMisalignedException("Columns & Values are not same"));
+              //  return row;
             }
-            DataCellCollection row = new DataCellCollection();
-            for (int i = 0; i < this.Columns.Count; i++)
+            for (int i = 0; i < this.Columns.Count && i < items.Length; i++)
             {
-                row.Add(new DataCell(Columns[i], "", items[i]));
+                row.Add(new DataCell(this.Columns[i], "", items[i]));
             }
-            return _dataCleaner.CleanRow(row);
+            return this._dataCleaner.CleanRow(row);
         }
     }
 }

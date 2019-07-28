@@ -4,11 +4,13 @@ namespace ET_Tool.Business
 {
     public interface IET_Engine : IDisposable
     {
-        bool Init();
+        bool InitializePrepocessing();
 
         void PerformTransformation();
 
-        bool RunDataAnalysis();
+        bool RunDataAnalysis(int attempt = 0);
+
+        bool PerformAutoClean(string dataSourceFileName, string csvTypeDef, int attempt);
 
 
     }

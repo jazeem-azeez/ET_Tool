@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
+
 using ET_Tool.Business.Mappers;
 using ET_Tool.Common;
 using ET_Tool.Common.IO;
 using ET_Tool.Common.Logger;
 using ET_Tool.Common.Models;
+
 using LumenWorks.Framework.IO.Csv;
+
 using Newtonsoft.Json;
 
 namespace ET_Tool.Business
@@ -41,9 +44,9 @@ namespace ET_Tool.Business
 
         public void Dispose() => throw new NotImplementedException();
 
-        public bool Init()
+        public bool InitializePrepocessing()
         {
-            if (this._runtimeSettings.AutoBuild == true)
+            try
             {
                 string[] sources = this._diskIOHandler.DirectoryGetFiles(Path.GetDirectoryName(this._runtimeSettings.SourceDataFolder), this._runtimeSettings.LookUpFilePattern, SearchOption.AllDirectories);
                 foreach (string item in sources)
@@ -63,12 +66,10 @@ namespace ET_Tool.Business
                 using (IDataSource dataSource = this._dataSourceFactory.GetDataSource(this._runtimeSettings.DataSourceFileName))
                 {
                     this._toSinkDataChainBuilder.AddSourceColumns(dataSource.GetHeaders());
-
                 }
                 using (IDataSink dataSink = this._dataSinkFactory.GetDataSink(this._runtimeSettings.DataSinkFileName, this._runtimeSettings.OutConfigFileName))
                 {
                     this._toSinkDataChainBuilder.AddSinkColumns(dataSink.Columns);
-
                 }
                 Dictionary<string, List<string>> mappingRules = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(this._diskIOHandler.FileReadAllText(this._runtimeSettings.MappingRulesSourcePath));
                 foreach (KeyValuePair<string, List<string>> item in mappingRules)
@@ -77,15 +78,61 @@ namespace ET_Tool.Business
                 }
 
                 this._toSinkDataChainBuilder.BuildChain();
+                return true;
             }
+            catch (Exception ex)
+            {
+                this._logger.Log("Initialization Failed : see logs for mor information", EventLevel.Error, ex);
+            }
+            return false;
+        }
 
-            return true;
+        public bool PerformAutoClean(string dataSourceFileName, string csvTypeDef, int attempt)
+        {
+            string tempId = Guid.NewGuid().ToString().Replace("-", "") + ".csv";
+            this._logger.LogInformation($"Attempting AutoClean : operationId{tempId}");
+
+            if (this._diskIOHandler.FileExists(csvTypeDef))
+            {
+                // type based cleaning ; not implemented
+            }
+            Dictionary<string, List<KeyValuePair<string, string>>> dictionary = JsonConvert.DeserializeObject<Dictionary<string, List<KeyValuePair<string, string>>>>(this._diskIOHandler.FileReadAllText(csvTypeDef));
+
+            int index = 0;
+            using (StreamWriter streamWriter = new StreamWriter(this._diskIOHandler.FileWriteTextStream(tempId)))
+            {
+                using (StreamReader streamReader = new StreamReader(this._diskIOHandler.FileReadTextStream(dataSourceFileName)))
+                {
+                    string[] headerRow = CsvParseHelper.GetAllFields(streamReader.ReadLine());
+
+                    while (streamReader.EndOfStream == false)
+                    {
+                        string line = streamReader.ReadLine();
+                        string[] data = CsvParseHelper.GetAllFields(line);
+                        // treat data misalliggnment
+                        if (data.Length != headerRow.Length)
+                        {
+                            string[] lines = this.TreatMisAlignment(tempId, index, headerRow, line, data);
+                            foreach (string alignedLine in lines)
+                            {
+                                streamWriter.WriteLine(alignedLine);
+                            }
+                        }
+                        streamWriter.WriteLine(string.Join(",", data));
+                        index++;
+                    }
+                }
+            }
+            this._diskIOHandler.FileCopy(dataSourceFileName, $"{dataSourceFileName}.bak");
+            this._diskIOHandler.FileCopy(tempId, dataSourceFileName, true);
+            return this.RunDataAnalysis(attempt);
         }
 
         public void PerformTransformation()
         {
             int ingestRowsCount = 0;
             int egressRowsCount = 0;
+
             using (IDataSource dataSource = this._dataSourceFactory.GetDataSource(this._runtimeSettings.DataSourceFileName))
             {
                 using (IDataSink dataSink = this._dataSinkFactory.GetDataSink(this._runtimeSettings.DataSinkFileName, this._runtimeSettings.OutConfigFileName))
@@ -107,17 +154,13 @@ namespace ET_Tool.Business
                             catch (Exception ex)
                             {
                                 this._logger.Log($"resolving failed for {dataSink.Columns[i]} \n raw row data {row.Cells.Select(c => $"{c.Column.Name}: {c.Value}").ToArray()}", EventLevel.Error, ex);
-
                             }
-
                         }
                         if (outRowCollection.Cells.Count != dataSink.Columns.Length)
                         {
                             this._logger.Log($"resolving failed for raw row data {row.Cells.Select(c => $"{c.Column.Name}: {c.Value}").ToArray()}", EventLevel.Error);
                             continue;
-
                         }
-
                         dataSink.AddRecordsToSink(outRowCollection.Cells);
                         egressRowsCount += 1;
                     }
@@ -126,77 +169,102 @@ namespace ET_Tool.Business
             this._logger.LogInformation($"Ingest = {ingestRowsCount} egress={egressRowsCount}");
         }
 
-        public bool RunDataAnalysis()
+        public bool RunDataAnalysis(int attempt = 0)
         {
-            int csvLines = 1, textLines = 0;
-            using (IDataSource dataSource = this._dataSourceFactory.GetDataSource(this._runtimeSettings.DataSourceFileName))
-            {
-                foreach (DataCellCollection row in dataSource.GetDataRowEntries())
-                {
-                    csvLines += 1;
-                }
-            }
+            this._logger.LogInformation("Runing Analysis");
+
+            this._logger.LogInformation("Scanning using text parser started");
+
+            int csvLines = 1, textLines = 0, noError = 0; ;
             using (StreamReader stream = new StreamReader(this._diskIOHandler.FileReadTextStream(this._runtimeSettings.DataSourceFileName)))
             {
+                int headerCount = CsvParseHelper.GetAllFields(stream.ReadLine()).Length;
+
                 while (stream.EndOfStream == false)
                 {
-                    stream.ReadLine();
+                    string line = stream.ReadLine();
+                    int cellcount = CsvParseHelper.GetAllFields(line).Length;
+                    if (cellcount != headerCount)
+                    {
+                        this._logger.Log($"Error Data Alignment mismatch cellcount {cellcount } != headerCount {headerCount } att position {textLines} , line :{line}", EventLevel.Error);
+                        noError++;
+                    }
+
                     textLines += 1;
                 }
             }
-            if (textLines == csvLines)
+            this._logger.LogInformation($"Scanning using text parser completed with {noError} errors ");
+            noError = 0;
+            this._logger.LogInformation("Scanning using csv parser started");
+
+            using (IDataSource dataSource = this._dataSourceFactory.GetDataSource(this._runtimeSettings.DataSourceFileName))
             {
-                this._logger.LogInformation("Text to record size mateched");
+                int headerCount = dataSource.GetHeaders().Length;
+                foreach (DataCellCollection row in dataSource.GetDataRowEntries())
+                {
+                    if (row.Cells.Count != headerCount)
+                    {
+                        this._logger.Log($"Error Data Alignment mismatch via csv parser cellcount {row.Cells.Count} != headerCount {headerCount } att position {csvLines}", EventLevel.Error);
+                        noError++;
+                    }
+                    csvLines += 1;
+                }
+            }
+            this._logger.LogInformation($"Scanning using csv parser completed with {noError} errors");
+
+            if (textLines == csvLines && noError == 0)
+            {
+                this._logger.LogInformation("Text to record size mateched & alignment test passed ");
                 return true;
             }
             else
             {
                 this._logger.Log($"Found mismatch in number of textLines {textLines} & Csv Lines {csvLines} - Please clean & make sure all the data is properly parsable", EventLevel.Error);
                 string dataSourceFileName = this._runtimeSettings.DataSourceFileName;
-                return this.PerformAutoClean(dataSourceFileName, Path.GetFileNameWithoutExtension(dataSourceFileName) + "-csvdef.json");
+                return this.PerformAutoClean(dataSourceFileName, Path.GetFileNameWithoutExtension(dataSourceFileName) + "-csvdef.json", attempt + 1);
             }
         }
 
-        public bool PerformAutoClean(string dataSourceFileName, string csvTypeDef)
+        private string[] TreatMisAlignment(string tempId, int index, string[] headerRow, string line, string[] data)
         {
-            string tempId = Guid.NewGuid().ToString().Replace("-", "");
-            this._logger.LogInformation($"Attempting AutoClean : operationId{tempId}");
+            List<string> fixedLines = new List<string>();
+            string input = string.Empty;
 
-            if (this._diskIOHandler.FileExists(csvTypeDef))
+            this._logger.LogInformation($"Attempting Alignment fix for index {index} in operationId{tempId}");
+            if (data.Length > headerRow.Length)
             {
-                Dictionary<string, string> dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(this._diskIOHandler.FileReadAllText(csvTypeDef));
-
-                using (StreamWriter streamWriter = new StreamWriter(this._diskIOHandler.FileWriteTextStream(tempId)))
+                this._logger.LogInformation("input Line :" + line);
+                if (data.Length % headerRow.Length == 0)
                 {
-                    using (StreamReader streamReader = new StreamReader(this._diskIOHandler.FileReadTextStream(this._runtimeSettings.DataSourceFileName)))
+                    for (int i = 0; i < data.Length; i += headerRow.Length)
                     {
-                        string []headerRow = CsvParseHelper.GetAllFields(streamReader.ReadLine());
-
-                        while (streamReader.EndOfStream == false)
-                        {
-                            string[] data = CsvParseHelper.GetAllFields(streamReader.ReadLine());
-                            if (data != null && data.Length > 0)
-                            {
-                                for (int i = 0; i < data.Length; i++)
-                                {
-                                    switch (dictionary[headerRow[i]])
-                                    {
-                                        case "num": break;
-                                        case "literal":
-                                            data[i] = data[i].StartsWith('"') ? data[i] : '"' + data[i];
-                                            data[i] = data[i].EndsWith('"') ? data[i] : data[i] + '"';
-                                            break;
-                                        default: break;
-                                    }
-                                }
-                            }
-                            streamWriter.WriteLine(string.Join(",", data));
-                        }
+                        IEnumerable<string> items = data.Skip(headerRow.Length).Take(headerRow.Length);
+                        fixedLines.Add(string.Join(",", items));
                     }
                 }
-                return true;
+                else
+                {
+                    while (input.ToLower() == "exit")
+                    {
+                        this._logger.LogInformation($"Please provide correct information line {index}: type exit to quit" + line);
+
+                        Console.WriteLine("Please provide correct data: line ");
+                        input = Console.ReadLine();
+                        fixedLines.Add(input);
+                    }
+                }
+
+                return fixedLines.ToArray();
             }
-            return false;
+            else
+            {
+                this._logger.LogInformation($"Please provide missing information line {index}: " + line);
+                Console.WriteLine("Please provide correct data: line ");
+                input = Console.ReadLine();
+                fixedLines.Add(input);
+            }
+
+            return null;
         }
     }
 }
