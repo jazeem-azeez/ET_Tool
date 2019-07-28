@@ -19,7 +19,7 @@ namespace ET_Tool
 
             EtLogger logger = new EtLogger(new ConsoleProgressBar());
 
-            logger.Log("=>", EventLevel.LogAlways);
+            logger.Log("=> Starting Custom CSV Et_Tool : ", EventLevel.LogAlways);
             IDiskIOHandler diskIOHandler = new DiskIOHandler();
             RuntimeArgs runtimeSettings = JsonConvert.DeserializeObject<RuntimeArgs>(diskIOHandler.FileReadAllText("runtimeConfig.Json"));
             
