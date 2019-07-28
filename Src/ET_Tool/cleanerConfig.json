@@ -1,0 +1,43 @@
+{
+
+  "code-list.csv-header": {
+    "Country": {
+      "Key": "rename",
+      "Value": "Country_code"
+    },
+    "Location": {
+      "Key": "rename",
+      "Value": "Location_code"
+    },
+    "Name": {
+      "Key": "rename",
+      "Value": "Location_Name"
+    },
+    "Function": {
+      "Key": "rename",
+      "Value": "FunctionCode"
+    }
+  },
+  "code-list.csv-row": {
+    "Function": {
+      "Key": "filter-for-symbol",
+      "Value": "([0-8][B][-])\\w+"
+    }
+  },
+  "country.txt-header": {
+    "CountryCode": {
+      "Key": "rename",
+      "Value": "Country_code"
+    },
+    "CountryName": {
+      "Key": "rename",
+      "Value": "Country_name"
+    }
+  },
+  "function_list.txt-header": {
+    "FunctionDescription": {
+      "Key": "rename",
+      "Value": "Location_Type"
+    }
+  }
+}

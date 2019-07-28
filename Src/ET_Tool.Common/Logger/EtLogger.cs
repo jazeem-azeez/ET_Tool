@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.Linq;
-using ET_Tool.Common.ConsoleIO;
+
+using ET_Tool.Common.IO.ConsoleIO;
+
 using Microsoft.Extensions.Configuration;
 
 //using Console = Colorful.Console;
@@ -12,11 +14,11 @@ namespace ET_Tool.Common.Logger
 {
     public class EtLogger : IEtLogger
     {
-        private readonly Serilog.Core.Logger _slogger;
-        private readonly ConsoleProgressBar _progressBar;
-
         private const int tableWidth = 100;
-        public EtLogger(IConfigurationRoot configuration, ConsoleProgressBar progressBar)
+        private readonly ConsoleProgressBar _progressBar;
+        private readonly Serilog.Core.Logger _slogger;
+
+        public EtLogger(ConsoleProgressBar progressBar)
         {
             LoggerConfiguration loggerConfiguration = new LoggerConfiguration()
             .MinimumLevel.Debug()
@@ -61,46 +63,12 @@ namespace ET_Tool.Common.Logger
             }
         }
 
+        public void LogError(string errormessage, Exception exception=null) =>this.Log(errormessage,EventLevel.Error,exception==null?new Exception(errormessage):exception);
+        public void LogInformation(string message) => this.Log(message, EventLevel.LogAlways);
+
         public void ProgressBar(int progress, int total, int level = -1) => this._progressBar.DrawTextProgressBar(progress, total, level);
-        private string AlignCentre(string text, int width)
-        {
-            text = text.Length > width ? text.Substring(0, width - 3) + "..." : text;
 
-            if (string.IsNullOrEmpty(text))
-            {
-                return new string(' ', width);
-            }
-            else
-            {
-                return text.PadRight(width - (width - text.Length) / 2).PadLeft(width);
-            }
-        }
-        private string PrintLine(int width = tableWidth)
-        {
-            string temp = new string('-', width);
-            Console.WriteLine(temp);
-            return temp;
-        }
-
-        private string PrintRow(params string[] columns)
-        {
-            if (columns == null || columns.Length == 0)
-            {
-
-                return this.PrintLine();
-            }
-            int width = (tableWidth - columns.Length) / columns.Length;
-            string row = "|";
-
-            foreach (string column in columns)
-            {
-                row += this.AlignCentre(column, width) + "|";
-            }
-
-            Console.WriteLine(row);
-            this.Log(row, EventLevel.Informational);
-            return row;
-        }
+        public void ShowRow(string[] rows) => this.PrintRow(rows);
 
         public void ShowTable(string TableName, string[] headers, List<string[]> rows, bool closeAtEnd = true)
         {
@@ -119,6 +87,45 @@ namespace ET_Tool.Common.Logger
                 this.PrintLine();
             }
         }
-        public void ShowRow(string[] rows) => this.PrintRow(rows);
+
+        private string AlignCentre(string text, int width)
+        {
+            text = text.Length > width ? text.Substring(0, width - 3) + "..." : text;
+
+            if (string.IsNullOrEmpty(text))
+            {
+                return new string(' ', width);
+            }
+            else
+            {
+                return text.PadRight(width - (width - text.Length) / 2).PadLeft(width);
+            }
+        }
+
+        private string PrintLine(int width = tableWidth)
+        {
+            string temp = new string('-', width);
+            Console.WriteLine(temp);
+            return temp;
+        }
+
+        private string PrintRow(params string[] columns)
+        {
+            if (columns == null || columns.Length == 0)
+            {
+                return this.PrintLine();
+            }
+            int width = (tableWidth - columns.Length) / columns.Length;
+            string row = "|";
+
+            foreach (string column in columns)
+            {
+                row += this.AlignCentre(column, width) + "|";
+            }
+
+            Console.WriteLine(row);
+            this.Log(row, EventLevel.Informational);
+            return row;
+        }
     }
 }

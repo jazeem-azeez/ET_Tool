@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.Tracing;
-using System.Linq;
-using ET_Tool.Business.DataSink;
-using ET_Tool.Business.DataSourceKinds;
+using ET_Tool.Business;
+using ET_Tool.Business.DataCleaner;
+using ET_Tool.Common.IO;
+using ET_Tool.Common.IO.ConsoleIO;
 using ET_Tool.Common.Logger;
-
-using Microsoft.Extensions.Configuration;
+using ET_Tool.Injection;
+using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 
 namespace ET_Tool
 {
@@ -16,25 +17,22 @@ namespace ET_Tool
         {
 
 
-            IConfigurationRoot configuration = new ConfigurationBuilder()
-          .AddJsonFile("appsettings.json")
-          .Build();
+            EtLogger logger = new EtLogger(new ConsoleProgressBar());
 
-            EtLogger logger = new EtLogger(configuration, new Common.ConsoleIO.ConsoleProgressBar());
-
-            logger.Log("Hello, Serilog!", EventLevel.LogAlways);
-            CsvDataSource source = new CsvDataSource(@"E:\ET_Tool\Data\geo_unlocode\code-list.csv", logger);
-            CsvDataSink csvDataSink = new CsvDataSink("out.csv", logger, "");
-            csvDataSink.AddHeader(source.GetHeaders());
-
-            //logger.ShowTable("csv", source.Columns.ToArray(), new List<string[]>(), false);
-            foreach (List<KeyValuePair<string, string>> item in source.GetDataEntries())
+            logger.Log("=> Starting Custom CSV Et_Tool : ", EventLevel.LogAlways);
+            IDiskIOHandler diskIOHandler = new DiskIOHandler();
+            RuntimeArgs runtimeSettings = JsonConvert.DeserializeObject<RuntimeArgs>(diskIOHandler.FileReadAllText("runtimeConfig.Json"));
+            
+            IServiceCollection services = new ServiceCollection();
+            services.AddSingleton(runtimeSettings);
+            services.MainInjection();
+            IServiceProvider serviceProvider = services.BuildServiceProvider();
+            IET_Engine engine = serviceProvider.GetRequiredService<IET_Engine>();
+            if (engine.RunDataAnalysis() && engine.InitializePrepocessing())
             {
-                csvDataSink.AddRow(item.Select(c => c.Value).ToArray());
-                //logger.ShowRow(item.Select(c => c.Value).ToArray());
+                engine.PerformTransformation();
             }
-
-            //Logger.CloseAndFlush();
+            
             Console.ReadLine();
             /*
              * 1. Load Configurations
@@ -56,6 +54,7 @@ namespace ET_Tool
              * 5. CheckSum Output , Input
              *
              */
+
         }
     }
 }

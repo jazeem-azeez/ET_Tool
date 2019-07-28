@@ -1,35 +1,44 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.Tracing;
+using System.Linq;
+
+using ET_Tool.Common;
 using ET_Tool.Common.Logger;
+using ET_Tool.Common.Models;
 
 namespace ET_Tool.Business.DataSourceKinds
 {
     public class CsvDataSource : CsvDataSourceKInd, IDataSource
     {
-        public CsvDataSource(string sourceFileName, IEtLogger logger) : base(sourceFileName, logger) => this.IsDataClean();
+        public CsvDataSource(string sourceFileName, IDataCleaner dataCleaner, IEtLogger logger) : base(sourceFileName, dataCleaner, logger) => this.IsDataClean();
 
-        public string[] GetHeaders() => this.Columns.ToArray();
-        public bool IsDataClean() => this.Init() && this.Columns != null && this.Columns.Count > 0;
-        public IEnumerable<List<KeyValuePair<string, string>>> GetDataEntries()
+        public IEnumerable<DataCellCollection> GetDataRowEntries()
         {
-            for (string[] items = this._csvParser.Read(); items != null; items = this._csvParser.Read())
+            while (this._streamReader.EndOfStream == false)
             {
-
-                yield return this.BuildRow(items);
+                yield return this.BuildRow(CsvParseHelper.GetAllFields(this._streamReader.ReadLine()));
             }
         }
 
-        private List<KeyValuePair<string, string>> BuildRow(string[] items)
+        public string[] GetHeaders() => this.Columns.Select(c => c.Name).ToArray();
+
+        public bool IsDataClean() => this.Init() && this.Columns != null && this.Columns.Count > 0;
+
+        private DataCellCollection BuildRow(string[] items)
         {
+
+            DataCellCollection row = new DataCellCollection();
             if (items.Length != this.Columns.Count)
             {
-
+                this._logger.Log($"Columns & Values are not same {string.Join(",",items) }", EventLevel.Error, new DataMisalignedException("Columns & Values are not same"));
+              //  return row;
             }
-            List<KeyValuePair<string, string>> result = new List<KeyValuePair<string, string>>();
-            for (int i = 0; i < this.Columns.Count; i++)
+            for (int i = 0; i < this.Columns.Count && i < items.Length; i++)
             {
-                result.Add(new KeyValuePair<string, string>(Columns[i], items[i]));
+                row.Add(new DataCell(this.Columns[i], "", items[i]));
             }
-            return result;
+            return this._dataCleaner.CleanRow(row);
         }
     }
 }

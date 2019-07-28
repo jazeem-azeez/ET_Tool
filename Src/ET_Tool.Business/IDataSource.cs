@@ -1,11 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using ET_Tool.Common.Models;
 
 namespace ET_Tool.Business
 {
-    public interface IDataSource
+    public interface IDataSource : IDisposable
     {
-        IEnumerable <List<KeyValuePair<string, string>>> GetDataEntries();
-        string[] GetHeaders(); 
+        IEnumerable<DataCellCollection> GetDataRowEntries();
+
+        string[] GetHeaders();
+
         bool IsDataClean();
     }
 }
