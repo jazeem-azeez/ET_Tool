@@ -52,7 +52,17 @@ namespace ET_Tool.L0.Tests
                 line);
             // Assert
 
-            Assert.IsTrue(result.Length == 2);
+            Assert.IsTrue(result.Length == 2);   
+            // Arrange 
+            line = ",MA,MDT,Midelt,Midelt,KHN,AA,--3-----,1607,,3240N 00444W,\"";
+
+
+            // Act
+            result = CsvParseHelper.GetAllFields(
+                line);
+            // Assert
+
+            Assert.IsTrue(result.Length == 12);
 
 
         }

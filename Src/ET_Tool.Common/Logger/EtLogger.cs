@@ -63,6 +63,7 @@ namespace ET_Tool.Common.Logger
             }
         }
 
+        public void LogError(string errormessage, Exception exception=null) =>this.Log(errormessage,EventLevel.Error,exception==null?new Exception(errormessage):exception);
         public void LogInformation(string message) => this.Log(message, EventLevel.LogAlways);
 
         public void ProgressBar(int progress, int total, int level = -1) => this._progressBar.DrawTextProgressBar(progress, total, level);

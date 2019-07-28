@@ -15,5 +15,6 @@ namespace ET_Tool.Common.Logger
         void ShowRow(string[] rows);
 
         void ShowTable(string TableName, string[] headers, List<string[]> rows, bool closeAtEnd = true);
+        void LogError(string fixedLineItem, Exception exception);
     }
 }

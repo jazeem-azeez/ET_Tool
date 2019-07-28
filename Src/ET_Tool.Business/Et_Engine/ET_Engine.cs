@@ -187,7 +187,7 @@ namespace ET_Tool.Business
 
             this._logger.LogInformation("Scanning using text parser started");
 
-            int csvLines = 1, textLines = 0, noError = 0; ;
+            int csvLines = 0, textLines = 0, noError = 0; 
             using (StreamReader stream = new StreamReader(this._diskIOHandler.FileReadTextStream(this._runtimeSettings.DataSourceFileName)))
             {
                 int headerCount = CsvParseHelper.GetAllFields(stream.ReadLine()).Length;
@@ -240,30 +240,45 @@ namespace ET_Tool.Business
         private string[] TreatMisAlignment(string tempId, int index, string[] headerRow, string line, string[] data)
         {
             List<string> fixedLines = new List<string>();
-            string input = string.Empty;
-
-            this._logger.LogInformation($"Attempting Alignment fix for index {index} in operationId{tempId}");
+            string fixedLineItem = string.Empty;
+            this._logger.LogInformation($"Attempting Auto Alignment fix for index {index} in operationId{tempId}");
             if (data.Length > headerRow.Length)
             {
                 this._logger.LogInformation("input Line :" + line);
 
-                for (int i = 0; i < data.Length; i += headerRow.Length)
+                for (int i = 0; i < data.Length; i += (headerRow.Length))
                 {
-                    IEnumerable<string> items = data.Skip(headerRow.Length).Take(headerRow.Length);
-                    fixedLines.Add(string.Join(",", items));
+                    string[] items = data.Skip(i).Take(headerRow.Length).ToArray();
+                    if (items.Length != headerRow.Length)
+                    {
+                        fixedLineItem = GetAssist(index, line,items);
+                    }
+                    else
+                    {
+                        fixedLineItem = string.Join(",", items);
+                    }
+                    _logger.LogInformation(fixedLineItem); 
+                    fixedLines.Add(fixedLineItem);
                 }
 
                 return fixedLines.ToArray();
             }
             else
             {
-                this._logger.LogInformation($"Please provide missing information line {index}: " + line);
-                Console.WriteLine("Please provide correct data: line ");
-                input = Console.ReadLine();
-                fixedLines.Add(input);
+                fixedLineItem = GetAssist(index, line,data);
+                fixedLines.Add(fixedLineItem);
             }
 
             return fixedLines.ToArray();
+        }
+
+        private string GetAssist(int index, string line, string[] items)
+        {
+            string input;
+            this._logger.LogInformation($"Unable to Auto fix for \r\n line {index} : {line} \r\n data [{string.Join(",",items)}] ");
+            Console.WriteLine("Please provide correct data: line ");
+            input = Console.ReadLine();
+            return input;
         }
     }
 }

@@ -43,22 +43,16 @@ namespace ET_Tool.Common
                 }
                 if (line[i] == ',')
                 {
-                    if ((i - markerStartPos) > 0)
-                    {
-                        subString = line.Substring(markerStartPos, i - markerStartPos);
-                    }
-                    else
-                    {
-                        subString = "";
-                    }
+
+                    subString = line.Substring(markerStartPos, i - markerStartPos); 
                     markerStartPos = i + 1;
                     detectedFields.Add("" + subString);
                 }
 
             }
-            if (markerStartPos<line.Length-1|| line.EndsWith(','))
+            if (markerStartPos < line.Length || line.EndsWith(','))
             {
-                
+
                 subString = line.Substring(markerStartPos, line.Length - markerStartPos);
                 detectedFields.Add(subString);
             }
