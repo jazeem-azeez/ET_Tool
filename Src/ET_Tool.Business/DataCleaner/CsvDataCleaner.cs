@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-
+using System.Linq;
+using System.Text.RegularExpressions;
 using ET_Tool.Common.Models;
 
 using LumenWorks.Framework.IO.Csv;
@@ -62,6 +63,11 @@ namespace ET_Tool.Business.DataCleaner
                         string colName = item.Column.Name;
                         switch (this.rowCleanCfg[colName].Key)
                         {
+                            case "filter-for-symbol":
+                                Regex regEx = new Regex(this.rowCleanCfg[colName].Value);
+                                MatchCollection matches = regEx.Matches(item.Value);
+                                item.Value = string.Join("", matches.Select(m => m.Value).ToArray());
+                                break;
                             case "remove-symbols":
                                 string[] symbols = this.rowCleanCfg[colName].Value.Split(' ');
                                 for (int i = 0; i < symbols.Length; i++)
@@ -70,7 +76,7 @@ namespace ET_Tool.Business.DataCleaner
                                 }
                                 break;
 
-                            case "replace-symbols":
+                            case "replace-symbol":
                                 symbols = this.rowCleanCfg[colName].Value.Split(' ');
                                 item.Value = item.Value.Replace(symbols[0], symbols[1]);
 

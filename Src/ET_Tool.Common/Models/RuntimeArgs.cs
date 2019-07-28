@@ -12,5 +12,6 @@ namespace ET_Tool.Business
         public string OutConfigFileName { get; set; }
         public Dictionary<string,string> DegreeToDecimalLatLongMapperSettings { get; set; }
         public string DefaultCleanerConfig { get; set; }
+        public string MappingRulesSourcePath { get; set; }
     }
 }

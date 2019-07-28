@@ -8,7 +8,7 @@ namespace ET_Tool.Business.Mappers
     {
         void AddNewDataLookUp(string key, DataLookUpCollection lookUpCollection);
 
-        //void AddNewDataMapRule(string key, List<string> mappers);
+        void AddNewMappingRule(string key, List<string> rules);
 
         //List<KeyValuePair<string, string>> FilterDataFor(string columnkey, string value, List<KeyValuePair<string, string>> contextValues);
 

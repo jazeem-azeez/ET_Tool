@@ -31,7 +31,7 @@ namespace ET_Tool
             RuntimeArgs runtimeSettings = new RuntimeArgs()
             {
                 AutoBuild = true,
-                DataSinkFileName = @"E:\ET_Tool\Data\geo_unlocode\out.csv",
+                DataSinkFileName = @"out.csv",
                 DataSourceFileName = @"E:\ET_Tool\Data\geo_unlocode\code-list.csv",
                 DegreeToDecimalLatLongMapperSettings = new Dictionary<string, string>
                 {
@@ -42,7 +42,8 @@ namespace ET_Tool
                 LookUpFilePattern = "*.txt",
                 OutConfigFileName = "outConfig.json",
                 SourceDataFolder = @"E:\ET_Tool\Data\geo_unlocode\",
-                DefaultCleanerConfig ="cleanerConfig.json"
+                DefaultCleanerConfig ="cleanerConfig.json",
+                MappingRulesSourcePath = "mappingRules.json"
 
             };
             diskIOHandler.FileWriteAllText("runtimeConfig.Json", JsonConvert.SerializeObject(runtimeSettings));
@@ -67,6 +68,7 @@ namespace ET_Tool
             //}
 
             //Logger.CloseAndFlush();
+
 
             Console.ReadLine();
             /*

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 using ET_Tool.Common.Models;
@@ -41,48 +42,31 @@ namespace ET_Tool.Business.Mappers.Transformation
               this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.longitudeKey],
   });
 
-        public List<KeyValuePair<string, string>> Map(string columnkey,
-            string value,
-            List<KeyValuePair<string, string>> mappingContextValues,
-            List<KeyValuePair<string, string>> currentState)
+        public List<DataCell> Map(DataCellCollection sourceRows, string columnkey, string value, Dictionary<string, string> Context, DataCellCollection currentState)
         {
-            if (
-                columnkey != this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.columnkey] ||
-                currentState.Exists(item => item.Key == this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.latitudeKey]) ||
-                currentState.Exists(item => item.Key == this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.longitudeKey])
-                )
-            {
-                return currentState;
-            }
+            List<DataCell> result = new List<DataCell>();
 
-            List<KeyValuePair<string, string>> temp = new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>(columnkey, value), new KeyValuePair<string, string>(columnkey + 1, value) };
-            return temp;
-        }
 
-        public DataCellCollection Map(string columnkey, string value, Dictionary<string, string> Context, DataCellCollection currentState)
-        {
-            if (
-              columnkey != this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.columnkey] ||
-              currentState.Cells.Exists(item => item.Column.Name == this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.latitudeKey]) ||
-              currentState.Cells.Exists(item => item.Column.Name == this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.longitudeKey])
-              )
-            {
-                return currentState;
-            }
 
-            string[] latlong = value.Split(" ");
-            if (latlong.Length <= 0)
+            string[] latlong = value.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+            if (latlong == null || latlong.Length < 2)
             {
-                return currentState;
+                result.Add(new DataCell(new LumenWorks.Framework.IO.Csv.Column() { Name = columnkey }, "", string.Empty));
+                return result;
             }
 
             double latitude = latlong[0].Contains('N') || latlong[0].Contains('S') ? this.ConvertDegreeAngleToDouble(latlong[0]) : this.ConvertDegreeAngleToDouble(latlong[1]);
             double longitude = latlong[0].Contains('E') || latlong[0].Contains('W') ? this.ConvertDegreeAngleToDouble(latlong[0]) : this.ConvertDegreeAngleToDouble(latlong[1]);
+            if (columnkey == this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.latitudeKey])
+            {
+                result.Add(new DataCell(new LumenWorks.Framework.IO.Csv.Column() { Name = this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.latitudeKey] }, "", latitude.ToString()));
+            }
+            if (columnkey == this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.longitudeKey])
+            {
+                result.Add(new DataCell(new LumenWorks.Framework.IO.Csv.Column() { Name = this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.longitudeKey] }, "", longitude.ToString()));
+            }
 
-            currentState.Add(new DataCell(new LumenWorks.Framework.IO.Csv.Column() { Name = this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.latitudeKey] }, "", latitude.ToString()));
-            currentState.Add(new DataCell(new LumenWorks.Framework.IO.Csv.Column() { Name = this._runtimeArgs.DegreeToDecimalLatLongMapperSettings[Constants.longitudeKey] }, "", longitude.ToString()));
-
-            return currentState;
+            return result;
         }
     }
 }

@@ -20,8 +20,8 @@
   },
   "code-list.csv-row": {
     "Function": {
-      "Key": "replace-symbol",
-      "Value": "- ,"
+      "Key": "filter-for-symbol",
+      "Value": "([0-8][B][-])\\w+"
     }
   },
   "country.txt-header": {

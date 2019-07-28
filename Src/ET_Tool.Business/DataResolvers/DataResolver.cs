@@ -33,44 +33,9 @@ namespace ET_Tool.Business.Mappers
 
 
         public void AddNewDataLookUp(string key, DataLookUpCollection lookUpCollection) => this._globalLookUpCollection.Add(key, lookUpCollection);
+        public void AddNewMappingRule(string key, List<string> rules) => this._mappingRulesCollection.Add(key, rules);
 
 
-
-        //public List<KeyValuePair<string, string>> FilterDataFor(string columnkey, string value, List<KeyValuePair<string, string>> mappingContextValues)
-        //{
-        //    List<KeyValuePair<string, string>> resultList = new List<KeyValuePair<string, string>>();
-        //    if (this._mappingRulesCollection.ContainsKey(columnkey))
-        //    {
-        //        foreach (string item in this._mappingRulesCollection[columnkey])
-        //        {
-        //            IDataMapper mapper = this.GetMapper(item);
-        //            resultList = mapper.Map(mappingContextValues, columnkey, value, resultList);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        resultList.Add(new KeyValuePair<string, string>(columnkey, value));
-        //    }
-        //    return resultList;
-        //}
-
-        //public List<KeyValuePair<string, string>> MapDataFor(string columnkey, string value, List<KeyValuePair<string, string>> mappingContextValues)
-        //{
-        //    List<KeyValuePair<string, string>> resultList = new List<KeyValuePair<string, string>>();
-        //    if (this._mappingRulesCollection.ContainsKey(columnkey))
-        //    {
-        //        foreach (string item in this._mappingRulesCollection[columnkey])
-        //        {
-        //            IDataMapper mapper = this.GetMapper(item);
-        //            resultList = mapper.Map(mappingContextValues, columnkey, value, resultList);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        resultList.Add(new KeyValuePair<string, string>(columnkey, value));
-        //    }
-        //    return resultList;
-        //}
 
         private IDataMapper GetMapper(string item)
         {
@@ -90,20 +55,21 @@ namespace ET_Tool.Business.Mappers
         {
 
             string currVal = string.Empty;
-
+            string peviousCol = string.Empty;
+            string peviousSource = string.Empty;
+            List<DataCell> dataCells = new List<DataCell>();
+            string destColumn = currentColumn.Name;
+            KeyValuePair<string, string> prevItem = new KeyValuePair<string, string>();
             foreach (KeyValuePair<string, string> item in steps)
             {
 
 
                 if (this._dataMappers.ContainsKey(item.Key))
                 {
-
-                    outRowCollection = this._dataMappers[item.Key].Map(currentColumn.Name, currVal, context, SourceRow); 
-
+                    dataCells.AddRange(this._dataMappers[item.Key].Map(SourceRow, currentColumn.Name, currVal, context, outRowCollection));
                 }
 
 
-                //TODOD move to constants
                 if (item.Key == Constants.SourceColKey)
                 {
                     for (int i = 0; i < SourceRow.Cells.Count; i++)
@@ -111,35 +77,63 @@ namespace ET_Tool.Business.Mappers
                         if (item.Value == SourceRow.Cells[i].Column.Name)
                         {
                             currVal = SourceRow.Cells[i].Value;
-
                             break;
                         }
                     }
                 }
                 if (this._globalLookUpCollection.ContainsKey(item.Key))
                 {
-                    if (_mappingRulesCollection.ContainsKey(item.Key))
+                    if (this._mappingRulesCollection.ContainsKey(GetMappingRuleKey(item, prevItem)))
                     {
-                        foreach (var mappingRule in _mappingRulesCollection[item.Key])
-                        {
-                            switch (mappingRule)
-                            {
-                                case "column-is-csv-lookup":
-                                default:
-                                    break;
-                            }
-                        }
+                        currVal = this.ApplyMappingRule(currVal, item, prevItem, (mappingItem) => this._globalLookUpCollection[item.Key].LookUp(item.Key, item.Value, mappingItem));
                     }
-                    currVal = this._globalLookUpCollection[item.Key].LookUp(item.Key, item.Value, currVal);
+                    else
+                    {
+                        currVal = this._globalLookUpCollection[item.Key].LookUp(item.Key, item.Value, currVal);
+                    }
                 }
+
                 //if (currentColumn.Name == item.Value)
                 //{
                 //    outRowCollection.Cells.Add(new DataCell(new Column { Name = item.Key }, "", currVal));
                 //}
+                prevItem = item;
             }
-            outRowCollection.Cells.Add(new DataCell(new Column { Name = currentColumn.Name }, "", currVal));
+
+            if (dataCells.Count == 0)
+            {
+                outRowCollection.Cells.Add(new DataCell(new Column { Name = currentColumn.Name }, "", currVal));
+            }
+            else
+            {
+                outRowCollection.Cells.AddRange(dataCells);
+            }
 
             return outRowCollection;
         }
+
+        private string ApplyMappingRule(string currVal, KeyValuePair<string, string> currdestPair, KeyValuePair<string, string> sourcePair, Func<string, string> callBack)
+        {
+            foreach (string mappingRule in this._mappingRulesCollection[GetMappingRuleKey(currdestPair, sourcePair)])
+            {
+                switch (mappingRule)
+                {
+                    case "split-by-letters":
+                        List<string> accumCollection = new List<string>();
+                        foreach (var csvItem in currVal)
+                        {
+                            accumCollection.Add(callBack($"{csvItem}"));
+                        }
+                        currVal = string.Join(",", accumCollection);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            return currVal;
+        }
+
+        private static string GetMappingRuleKey(KeyValuePair<string, string> currdestPair, KeyValuePair<string, string> sourcePair) => $"{sourcePair.Key}:{sourcePair.Value}=>{currdestPair.Key}:{currdestPair.Value}";
     }
 }

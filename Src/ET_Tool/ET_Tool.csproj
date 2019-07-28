@@ -24,6 +24,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="mappingRules.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="cleanerConfig.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

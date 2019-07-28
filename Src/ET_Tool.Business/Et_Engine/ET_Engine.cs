@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.IO;
-
+using System.Linq;
 using ET_Tool.Business.Mappers;
 using ET_Tool.Common.IO;
 using ET_Tool.Common.Logger;
 using ET_Tool.Common.Models;
 using LumenWorks.Framework.IO.Csv;
+using Newtonsoft.Json;
 
 namespace ET_Tool.Business
 {
@@ -33,7 +35,7 @@ namespace ET_Tool.Business
             this._logger = logger;
             this._diskIOHandler = diskIOHandler;
             this._runtimeSettings = runtimeSettings;
-            _toSinkDataChainBuilder = new SourceToSinkDataChainBuilder(logger);
+            this._toSinkDataChainBuilder = new SourceToSinkDataChainBuilder(logger);
         }
 
         public void Dispose() => throw new NotImplementedException();
@@ -67,6 +69,11 @@ namespace ET_Tool.Business
                     this._toSinkDataChainBuilder.AddSinkColumns(dataSink.Columns);
 
                 }
+                Dictionary<string, List<string>> mappingRules = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(this._diskIOHandler.FileReadAllText(this._runtimeSettings.MappingRulesSourcePath));
+                foreach (KeyValuePair<string, List<string>> item in mappingRules)
+                {
+                    this._dataMapHandler.AddNewMappingRule(item.Key, item.Value);
+                }
 
                 this._toSinkDataChainBuilder.BuildChain();
             }
@@ -76,6 +83,8 @@ namespace ET_Tool.Business
 
         public void Run()
         {
+            int ingestRowsCount = 0;
+            int egressRowsCount = 0;
             using (IDataSource dataSource = this._dataSourceFactory.GetDataSource(this._runtimeSettings.DataSourceFileName))
             {
                 using (IDataSink dataSink = this._dataSinkFactory.GetDataSink(this._runtimeSettings.DataSinkFileName, this._runtimeSettings.OutConfigFileName))
@@ -84,19 +93,36 @@ namespace ET_Tool.Business
                     Dictionary<string, string> context = new Dictionary<string, string>();
                     foreach (DataCellCollection row in dataSource.GetDataRowEntries())
                     {
+                        ingestRowsCount += 1;
                         DataCellCollection outRowCollection = new DataCellCollection();
                         for (int i = 0; i < dataSink.Columns.Length; i++)
                         {
                             Dictionary<string, string> steps = this._toSinkDataChainBuilder.GetSteps(dataSink.Columns[i]);
 
-                            outRowCollection = this._dataMapHandler.Resolve(row, new Column() { Name = dataSink.Columns[i] }, outRowCollection, steps, context);
+                            try
+                            {
+                                outRowCollection = this._dataMapHandler.Resolve(row, new Column() { Name = dataSink.Columns[i] }, outRowCollection, steps, context);
+                            }
+                            catch (Exception ex)
+                            {
+                                this._logger.Log($"resolving failed for {dataSink.Columns[i]} \n raw row data {row.Cells.Select(c => $"{c.Column.Name}: {c.Value}").ToArray()}", EventLevel.Error, ex);
+
+                            }
+
+                        }
+                        if (outRowCollection.Cells.Count != dataSink.Columns.Length)
+                        {
+                            this._logger.Log($"resolving failed for raw row data {row.Cells.Select(c => $"{c.Column.Name}: {c.Value}").ToArray()}", EventLevel.Error);
+                            continue;
 
                         }
 
                         dataSink.AddRecordsToSink(outRowCollection.Cells);
+                        egressRowsCount += 1;
                     }
                 }
             }
+            _logger.LogInformation($"Ingest = {ingestRowsCount} egress={egressRowsCount}");
         }
 
 

@@ -97,7 +97,7 @@ namespace ET_Tool.Business.Mappers
                 }
             }
 
-            this._logger.Log("Build Chain Integrity Check Passed", System.Diagnostics.Tracing.EventLevel.Error);
+            this._logger.Log("Build Chain Integrity Check Passed", System.Diagnostics.Tracing.EventLevel.Informational);
         }
 
         public Dictionary<string, string> GetSteps(string name) => _steps[name];
