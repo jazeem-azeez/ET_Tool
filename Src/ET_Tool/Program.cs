@@ -56,8 +56,10 @@ namespace ET_Tool
             Dictionary<string, IDataFilter> dataFilter = new Dictionary<string, IDataFilter>();
             IDataResolver dataResolver = new DataResolver(dataMappers, dataFilter, logger);
             ET_Engine engine = new ET_Engine(dataSourceFactory, dataResolver, dataSinkFactory, logger, diskIOHandler, runtimeSettings);
+
             engine.Init();
-            engine.Run();
+            engine.RunDataAnalysis();
+            engine.PerformTransformation();
 
 
             //logger.ShowTable("csv", source.Columns.ToArray(), new List<string[]>(), false);

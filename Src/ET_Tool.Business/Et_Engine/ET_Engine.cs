@@ -4,6 +4,7 @@ using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using ET_Tool.Business.Mappers;
+using ET_Tool.Common;
 using ET_Tool.Common.IO;
 using ET_Tool.Common.Logger;
 using ET_Tool.Common.Models;
@@ -81,7 +82,7 @@ namespace ET_Tool.Business
             return true;
         }
 
-        public void Run()
+        public void PerformTransformation()
         {
             int ingestRowsCount = 0;
             int egressRowsCount = 0;
@@ -122,9 +123,80 @@ namespace ET_Tool.Business
                     }
                 }
             }
-            _logger.LogInformation($"Ingest = {ingestRowsCount} egress={egressRowsCount}");
+            this._logger.LogInformation($"Ingest = {ingestRowsCount} egress={egressRowsCount}");
         }
 
+        public bool RunDataAnalysis()
+        {
+            int csvLines = 1, textLines = 0;
+            using (IDataSource dataSource = this._dataSourceFactory.GetDataSource(this._runtimeSettings.DataSourceFileName))
+            {
+                foreach (DataCellCollection row in dataSource.GetDataRowEntries())
+                {
+                    csvLines += 1;
+                }
+            }
+            using (StreamReader stream = new StreamReader(this._diskIOHandler.FileReadTextStream(this._runtimeSettings.DataSourceFileName)))
+            {
+                while (stream.EndOfStream == false)
+                {
+                    stream.ReadLine();
+                    textLines += 1;
+                }
+            }
+            if (textLines == csvLines)
+            {
+                this._logger.LogInformation("Text to record size mateched");
+                return true;
+            }
+            else
+            {
+                this._logger.Log($"Found mismatch in number of textLines {textLines} & Csv Lines {csvLines} - Please clean & make sure all the data is properly parsable", EventLevel.Error);
+                string dataSourceFileName = this._runtimeSettings.DataSourceFileName;
+                return this.PerformAutoClean(dataSourceFileName, Path.GetFileNameWithoutExtension(dataSourceFileName) + "-csvdef.json");
+            }
+        }
 
+        public bool PerformAutoClean(string dataSourceFileName, string csvTypeDef)
+        {
+            string tempId = Guid.NewGuid().ToString().Replace("-", "");
+            this._logger.LogInformation($"Attempting AutoClean : operationId{tempId}");
+
+            if (this._diskIOHandler.FileExists(csvTypeDef))
+            {
+                Dictionary<string, string> dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(this._diskIOHandler.FileReadAllText(csvTypeDef));
+
+                using (StreamWriter streamWriter = new StreamWriter(this._diskIOHandler.FileWriteTextStream(tempId)))
+                {
+                    using (StreamReader streamReader = new StreamReader(this._diskIOHandler.FileReadTextStream(this._runtimeSettings.DataSourceFileName)))
+                    {
+                        string []headerRow = CsvParseHelper.GetAllFields(streamReader.ReadLine());
+
+                        while (streamReader.EndOfStream == false)
+                        {
+                            string[] data = CsvParseHelper.GetAllFields(streamReader.ReadLine());
+                            if (data != null && data.Length > 0)
+                            {
+                                for (int i = 0; i < data.Length; i++)
+                                {
+                                    switch (dictionary[headerRow[i]])
+                                    {
+                                        case "num": break;
+                                        case "literal":
+                                            data[i] = data[i].StartsWith('"') ? data[i] : '"' + data[i];
+                                            data[i] = data[i].EndsWith('"') ? data[i] : data[i] + '"';
+                                            break;
+                                        default: break;
+                                    }
+                                }
+                            }
+                            streamWriter.WriteLine(string.Join(",", data));
+                        }
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
     }
 }

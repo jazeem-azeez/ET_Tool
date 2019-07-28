@@ -22,7 +22,7 @@ namespace ET_Tool.Business.Mappers
         }
 
         public Dictionary<string, string> Chain { get; set; }
-        private Dictionary<string, Dictionary<string, string>> _steps;
+        private readonly Dictionary<string, Dictionary<string, string>> _steps;
         public Dictionary<string, HashSet<string>> LookUps { get; set; }
         public HashSet<string> SinkColumns { get; set; }
         public HashSet<string> SourceColumns { get; set; }
@@ -85,21 +85,20 @@ namespace ET_Tool.Business.Mappers
                     }
                 }
             }
-            if (this.Chain.Count == this.SinkColumns.Count)
+
+            foreach (string item in this.SinkColumns)
             {
-                foreach (string item in this.SinkColumns)
+                if (this.Chain.ContainsKey(item) == false)
                 {
-                    if (this.Chain.ContainsKey(item) == false)
-                    {
-                        this._logger.Log("Build Chain Integrity Check Failed", System.Diagnostics.Tracing.EventLevel.Error);
-                        return;
-                    }
+                    this._logger.Log("Build Chain Integrity Check Failed", System.Diagnostics.Tracing.EventLevel.Error);
+                    throw new Exception("Data dependency Chain build failed ");
                 }
             }
+
 
             this._logger.Log("Build Chain Integrity Check Passed", System.Diagnostics.Tracing.EventLevel.Informational);
         }
 
-        public Dictionary<string, string> GetSteps(string name) => _steps[name];
+        public Dictionary<string, string> GetSteps(string name) => this._steps[name];
     }
 }

@@ -6,6 +6,10 @@ namespace ET_Tool.Business
     {
         bool Init();
 
-        void Run();
+        void PerformTransformation();
+
+        bool RunDataAnalysis();
+
+
     }
 }

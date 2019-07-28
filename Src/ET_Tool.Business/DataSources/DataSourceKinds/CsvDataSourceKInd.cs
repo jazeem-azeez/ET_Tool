@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.IO;
-
+using System.Text;
 using ET_Tool.Common.Logger;
 
 using LumenWorks.Framework.IO.Csv;
@@ -48,11 +48,11 @@ namespace ET_Tool.Business.DataSourceKinds
             );
             //TODO : update to use IdiskIohandler
             this._streamReader = new StreamReader(this._sourceFileName);
-            this._csvReader = new CsvReader(this._streamReader, true)
+            this._csvReader = new CsvReader(this._streamReader,true)
             {
                 DefaultParseErrorAction = ParseErrorAction.RaiseEvent
             };
-
+            ;
             this._csvReader.ParseError += this.Csv_ParseError;
             this._csvReader.ReadNextRecord();
             this.Columns.AddRange(this._csvReader.Columns);
@@ -64,12 +64,14 @@ namespace ET_Tool.Business.DataSourceKinds
 
         private void Csv_ParseError(object sender, ParseErrorEventArgs e)
         {
-            // if the error is that a field is missing, then skip to next line
-            if (e.Error is MissingFieldCsvException)
-            {
-                this._logger.Log($"--MISSING FIELD ERROR OCCURRED, on {e.Error.CurrentRecordIndex}", EventLevel.Error);
-                e.Action = ParseErrorAction.AdvanceToNextLine;
-            }
+            this._logger.Log($"--Parse Error OCCURRED, on {e.Error.CurrentRecordIndex}", EventLevel.Error);
+
+            //// if the error is that a field is missing, then skip to next line
+            //if (e.Error is MissingFieldCsvException)
+            //{
+            //    this._logger.Log($"--MISSING FIELD ERROR OCCURRED, on {e.Error.CurrentRecordIndex}", EventLevel.Error);
+            //    e.Action = ParseErrorAction.AdvanceToNextLine;
+            //}
         }
     }
 }
