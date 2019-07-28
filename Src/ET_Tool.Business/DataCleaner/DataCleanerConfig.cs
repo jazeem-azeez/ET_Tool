@@ -12,9 +12,9 @@ namespace ET_Tool.Business.DataCleaner
         private readonly Dictionary<string, Dictionary<string, KeyValuePair<string, string>>> _cleanerConfigs;
         private readonly IDiskIOHandler _iOHandler;
 
-        public DataCleanerConfig(string cleanerConfigFileName, IDiskIOHandler iOHandler)
+        public DataCleanerConfig(RuntimeArgs runtimeArgs, IDiskIOHandler iOHandler)
         {
-            this._cleanerConfigFileName = cleanerConfigFileName;
+            this._cleanerConfigFileName = runtimeArgs.DefaultCleanerConfig;
             this._iOHandler = iOHandler;
             this._cleanerConfigs = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, KeyValuePair<string, string>>>>(this._iOHandler.FileReadAllText(this._cleanerConfigFileName));
         }

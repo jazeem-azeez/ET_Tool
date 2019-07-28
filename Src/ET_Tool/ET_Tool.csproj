@@ -9,6 +9,7 @@
     <PackageReference Include="LumenWorksCsvReader" Version="4.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
     <PackageReference Include="Serilog" Version="2.8.0" />
     <PackageReference Include="Serilog.Enrichers.Memory" Version="1.0.4" />
     <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.1" />
@@ -21,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ET_Tool.Business\ET_Tool.Business.csproj" />
     <ProjectReference Include="..\ET_Tool.Common\ET_Tool.Common.csproj" />
+    <ProjectReference Include="..\ET_Tool.Injection\ET_Tool.Injection.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,6 +36,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="appSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="runtimeConfig.Json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

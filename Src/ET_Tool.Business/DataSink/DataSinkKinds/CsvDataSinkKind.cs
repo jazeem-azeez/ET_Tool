@@ -33,7 +33,7 @@ namespace ET_Tool.Business.DataSink.DataSinkKinds
         public string[] Columns { get; private set; }
         public Dictionary<string, string> OutInfo { get; private set; }
 
-        public void AddRecordsToSink(string[] row) => this._streamWriter.WriteLine(string.Join(',', row));
+        public void AddRecordsToSink(string[] row) => this._streamWriter.WriteLine(string.Join(RowDelimiterSeparator, row));
 
         public void AddRecordsToSink(List<DataCell> cells) => this.AddRecordsToSink(cells.Select(c => c.Value).ToArray());
         public void Dispose() => this._streamWriter.Dispose();
@@ -60,7 +60,7 @@ namespace ET_Tool.Business.DataSink.DataSinkKinds
 
         private bool AddHeader(string[] header)
         {
-            this._streamWriter.WriteLine(string.Join(',', header));
+            this._streamWriter.WriteLine(string.Join(HeaderDelimiterSeparator, header));
             return true;
         }
     }

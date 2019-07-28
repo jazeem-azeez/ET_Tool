@@ -18,7 +18,7 @@ namespace ET_Tool.Common.Logger
         private readonly ConsoleProgressBar _progressBar;
         private readonly Serilog.Core.Logger _slogger;
 
-        public EtLogger(IConfigurationRoot configuration, ConsoleProgressBar progressBar)
+        public EtLogger(ConsoleProgressBar progressBar)
         {
             LoggerConfiguration loggerConfiguration = new LoggerConfiguration()
             .MinimumLevel.Debug()
