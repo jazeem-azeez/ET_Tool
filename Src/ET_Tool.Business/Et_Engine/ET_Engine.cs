@@ -95,19 +95,21 @@ namespace ET_Tool.Business
             if (this._diskIOHandler.FileExists(csvTypeDef))
             {
                 // type based cleaning ; not implemented
+                Dictionary<string, List<KeyValuePair<string, string>>> dictionary = JsonConvert.DeserializeObject<Dictionary<string, List<KeyValuePair<string, string>>>>(this._diskIOHandler.FileReadAllText(csvTypeDef));
             }
-            Dictionary<string, List<KeyValuePair<string, string>>> dictionary = JsonConvert.DeserializeObject<Dictionary<string, List<KeyValuePair<string, string>>>>(this._diskIOHandler.FileReadAllText(csvTypeDef));
 
             int index = 0;
             using (StreamWriter streamWriter = new StreamWriter(this._diskIOHandler.FileWriteTextStream(tempId)))
             {
                 using (StreamReader streamReader = new StreamReader(this._diskIOHandler.FileReadTextStream(dataSourceFileName)))
                 {
-                    string[] headerRow = CsvParseHelper.GetAllFields(streamReader.ReadLine());
+                    string line = streamReader.ReadLine();
+                    string[] headerRow = CsvParseHelper.GetAllFields(line);
+                    streamWriter.WriteLine(line);
 
                     while (streamReader.EndOfStream == false)
                     {
-                        string line = streamReader.ReadLine();
+                        line = streamReader.ReadLine();
                         string[] data = CsvParseHelper.GetAllFields(line);
                         // treat data misalliggnment
                         if (data.Length != headerRow.Length)
@@ -118,12 +120,16 @@ namespace ET_Tool.Business
                                 streamWriter.WriteLine(alignedLine);
                             }
                         }
-                        streamWriter.WriteLine(string.Join(",", data));
+                        else
+                        {
+                            streamWriter.WriteLine(string.Join(",", data));
+                        }
+
                         index++;
                     }
                 }
             }
-            this._diskIOHandler.FileCopy(dataSourceFileName, $"{dataSourceFileName}.bak");
+            this._diskIOHandler.FileCopy(dataSourceFileName, $"{dataSourceFileName}{tempId}.bak");
             this._diskIOHandler.FileCopy(tempId, dataSourceFileName, true);
             return this.RunDataAnalysis(attempt);
         }
@@ -171,6 +177,12 @@ namespace ET_Tool.Business
 
         public bool RunDataAnalysis(int attempt = 0)
         {
+            if (attempt > 2)
+            {
+                this._logger.Log("Attempt Limit has reached , Aborting analiysys", EventLevel.Error);
+                return false;
+            }
+
             this._logger.LogInformation("Runing Analysis");
 
             this._logger.LogInformation("Scanning using text parser started");
@@ -234,24 +246,11 @@ namespace ET_Tool.Business
             if (data.Length > headerRow.Length)
             {
                 this._logger.LogInformation("input Line :" + line);
-                if (data.Length % headerRow.Length == 0)
-                {
-                    for (int i = 0; i < data.Length; i += headerRow.Length)
-                    {
-                        IEnumerable<string> items = data.Skip(headerRow.Length).Take(headerRow.Length);
-                        fixedLines.Add(string.Join(",", items));
-                    }
-                }
-                else
-                {
-                    while (input.ToLower() == "exit")
-                    {
-                        this._logger.LogInformation($"Please provide correct information line {index}: type exit to quit" + line);
 
-                        Console.WriteLine("Please provide correct data: line ");
-                        input = Console.ReadLine();
-                        fixedLines.Add(input);
-                    }
+                for (int i = 0; i < data.Length; i += headerRow.Length)
+                {
+                    IEnumerable<string> items = data.Skip(headerRow.Length).Take(headerRow.Length);
+                    fixedLines.Add(string.Join(",", items));
                 }
 
                 return fixedLines.ToArray();
@@ -264,7 +263,7 @@ namespace ET_Tool.Business
                 fixedLines.Add(input);
             }
 
-            return null;
+            return fixedLines.ToArray();
         }
     }
 }

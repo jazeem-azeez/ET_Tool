@@ -12,6 +12,5 @@ namespace ET_Tool.Business
 
         bool PerformAutoClean(string dataSourceFileName, string csvTypeDef, int attempt);
 
-
     }
 }
