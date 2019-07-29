@@ -4,13 +4,16 @@
   1. Artifats - to share runnable binaries
   2. Data - Contains Sample data to get Started
   3. Doc - Main Folder to containg documentation
+  
     1. Media - contain media content
+    
   4. Src - Contains Source Code
-    2. Et_tool - Main Program entry point , will be changed wrtt running enviornment
-    3. *.Business - Contains Logic
-    4. *.Common - Contains Shareable non business logic & implementations
-    5. *.Logging - Conaints Logging Implementation & Program stats related 
-    6. *.Injection - Conaints core injection wire up, inorder to make things modular
+  
+    1. Et_tool - Main Program entry point , will be changed wrtt running enviornment
+    2. *.Business - Contains Logic
+    3. *.Common - Contains Shareable non business logic & implementations
+    4. *.Logging - Conaints Logging Implementation & Program stats related 
+    5. *.Injection - Conaints core injection wire up, inorder to make things modular
    
 ## How to use
 
