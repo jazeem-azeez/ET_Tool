@@ -33,7 +33,7 @@ produce in following format
 
 [Design Documentation](https://github.com/jazeem-azeez/ET_Tool/blob/master/Doc/DesignDoc.md) - tells you how it works under the hood
 
-[Getting started ](https://github.com/jazeem-azeez/ET_Tool/blob/master/Doc/DesignDoc.md) - tells you how to use this application to perform etl
+[Getting started ](https://github.com/jazeem-azeez/ET_Tool/blob/master/Doc/HowTo.md) - tells you how to use this application to perform etl
 
 
 
