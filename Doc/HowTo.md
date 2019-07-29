@@ -66,7 +66,7 @@ description : for value (FunctionCode )in source file  apply operation (split-by
 ```
 ### 3. RuntimeConfig.json
     runtime parameters & settings
-```json
+```javascript
     {
     "AutoBuild": true, /*changes behaviour to auto build & clean*/
     "LookUpFilePattern": "*.txt", /*look up file pattern file */

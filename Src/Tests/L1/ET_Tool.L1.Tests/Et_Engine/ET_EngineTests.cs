@@ -1,126 +1,108 @@
+using System.IO;
 using ET_Tool.Business;
-using ET_Tool.Business.Mappers;
 using ET_Tool.Common.IO;
-using ET_Tool.Common.Logger;
+using ET_Tool.Injection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
+using Newtonsoft.Json;
 
 namespace ET_Tool.L1.Tests.Et_Engine
 {
     [TestClass]
     public class ET_EngineTests
     {
-        private MockRepository mockRepository;
 
-        private Mock<IDataSourceFactory> mockDataSourceFactory;
-        private Mock<IDataResolver> mockDataResolver;
-        private Mock<IDataSinkFactory> mockDataSinkFactory;
-        private Mock<IEtLogger> mockEtLogger;
-        private Mock<IDiskIOHandler> mockDiskIOHandler;
-        private Mock<RuntimeArgs> mockRuntimeArgs;
+        private readonly IET_Engine engine;
+        private ServiceProvider serviceProvider;
+        private RuntimeArgs runtimeSettings;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            this.mockRepository = new MockRepository(MockBehavior.Strict);
-
-            this.mockDataSourceFactory = this.mockRepository.Create<IDataSourceFactory>();
-            this.mockDataResolver = this.mockRepository.Create<IDataResolver>();
-            this.mockDataSinkFactory = this.mockRepository.Create<IDataSinkFactory>();
-            this.mockEtLogger = this.mockRepository.Create<IEtLogger>();
-            this.mockDiskIOHandler = this.mockRepository.Create<IDiskIOHandler>();
-            this.mockRuntimeArgs = this.mockRepository.Create<RuntimeArgs>();
+            IDiskIOHandler diskIOHandler = new DiskIOHandler();
+            runtimeSettings = JsonConvert.DeserializeObject<RuntimeArgs>(diskIOHandler.FileReadAllText("runtimeConfig.Json"));
+            runtimeSettings.DataSourceFileName = Path.Combine(Directory.GetCurrentDirectory(), runtimeSettings.DataSourceFileName); 
+            runtimeSettings.SourceDataFolder = Path.Combine(Directory.GetCurrentDirectory(), runtimeSettings.SourceDataFolder);
+            IServiceCollection services = new ServiceCollection();
+            services.AddSingleton(runtimeSettings);
+            services.MainInjection();
+            this.serviceProvider = services.BuildServiceProvider();
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
-            this.mockRepository.VerifyAll();
+
         }
 
-        private ET_Engine CreateET_Engine()
-        {
-            return new ET_Engine(
-                this.mockDataSourceFactory.Object,
-                this.mockDataResolver.Object,
-                this.mockDataSinkFactory.Object,
-                this.mockEtLogger.Object,
-                this.mockDiskIOHandler.Object,
-                this.mockRuntimeArgs.Object);
-        }
+        private IET_Engine CreateET_Engine() => this.serviceProvider.GetRequiredService<IET_Engine>();
 
-        [TestMethod]
-        public void Dispose_StateUnderTest_ExpectedBehavior()
-        {
-            // Arrange
-            var eT_Engine = this.CreateET_Engine();
-
-            // Act
-            eT_Engine.Dispose();
-
-            // Assert
-            Assert.Fail();
-        }
 
         [TestMethod]
         public void InitializePrepocessing_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            var eT_Engine = this.CreateET_Engine();
+            IET_Engine eT_Engine = this.CreateET_Engine();
 
             // Act
-            var result = eT_Engine.InitializePrepocessing();
+            bool result = eT_Engine.InitializePrepocessing();
 
             // Assert
-            Assert.Fail();
+            Assert.IsTrue(result);
         }
 
         [TestMethod]
         public void PerformAutoClean_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            var eT_Engine = this.CreateET_Engine();
-            string dataSourceFileName = null;
+            IET_Engine eT_Engine = this.CreateET_Engine();
+            
             string csvTypeDef = null;
             int attempt = 0;
 
             // Act
-            var result = eT_Engine.PerformAutoClean(
-                dataSourceFileName,
+            bool result = eT_Engine.InitializePrepocessing();
+
+             result = eT_Engine.PerformAutoClean(
+                runtimeSettings.DataSourceFileName,
                 csvTypeDef,
                 attempt);
 
-            // Assert
-            Assert.Fail();
+            // Assert            
+            Assert.IsTrue(result);
+
         }
 
         [TestMethod]
         public void PerformTransformation_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            var eT_Engine = this.CreateET_Engine();
-
+            IET_Engine eT_Engine = this.CreateET_Engine();
+            bool result = false;
+            if (eT_Engine.RunDataAnalysis() && eT_Engine.InitializePrepocessing())
+            {
+                 
+                result = eT_Engine.PerformTransformation();
+            }
             // Act
-            eT_Engine.PerformTransformation();
 
             // Assert
-            Assert.Fail();
+            Assert.IsTrue(result);
         }
 
         [TestMethod]
         public void RunDataAnalysis_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            var eT_Engine = this.CreateET_Engine();
+            IET_Engine eT_Engine = this.CreateET_Engine();
             int attempt = 0;
 
             // Act
-            var result = eT_Engine.RunDataAnalysis(
+            bool result = eT_Engine.RunDataAnalysis(
                 attempt);
 
             // Assert
-            Assert.Fail();
+            Assert.IsTrue(result);
         }
     }
 }

@@ -1,8 +1,14 @@
-using ET_Tool.Business;
-using ET_Tool.Business.Mappers.Transformation;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using System;
+using System.Collections.Generic;
+
+using ET_Tool.Business;
+using ET_Tool.Business.Mappers;
+using ET_Tool.Business.Mappers.Transformation;
+using ET_Tool.Common.Models;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Moq;
 
 namespace ET_Tool.L0.Tests.DataResolvers.Mappers
 {
@@ -11,92 +17,127 @@ namespace ET_Tool.L0.Tests.DataResolvers.Mappers
     {
         private MockRepository mockRepository;
 
-        private Mock<RuntimeArgs> mockRuntimeArgs;
-
-        [TestInitialize]
-        public void TestInitialize()
-        {
-            this.mockRepository = new MockRepository(MockBehavior.Strict);
-
-            this.mockRuntimeArgs = this.mockRepository.Create<RuntimeArgs>();
-        }
-
-        [TestCleanup]
-        public void TestCleanup()
-        {
-            this.mockRepository.VerifyAll();
-        }
-
-        private DegreeToDecimalLatLongMapper CreateDegreeToDecimalLatLongMapper()
-        {
-            return new DegreeToDecimalLatLongMapper(
-                this.mockRuntimeArgs.Object);
-        }
-
         [TestMethod]
         public void BindToLookUpCollection_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            var degreeToDecimalLatLongMapper = this.CreateDegreeToDecimalLatLongMapper();
-            Dictionary globalLookUpCollection = null;
+            DegreeToDecimalLatLongMapper degreeToDecimalLatLongMapper = this.CreateDegreeToDecimalLatLongMapper();
+            Dictionary<string, IDataLookUpCollection> globalLookUpCollection = new Dictionary<string, IDataLookUpCollection>();
 
             // Act
-            degreeToDecimalLatLongMapper.BindToLookUpCollection(
-                globalLookUpCollection);
-
-            // Assert
-            Assert.Fail();
+            try
+            {
+                degreeToDecimalLatLongMapper.BindToLookUpCollection(
+                     globalLookUpCollection);
+            }
+            catch (Exception)
+            {
+                // Assert
+                //NOP method
+                Assert.Fail();
+            }
         }
 
         [TestMethod]
         public void ConvertDegreeAngleToDouble_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            var degreeToDecimalLatLongMapper = this.CreateDegreeToDecimalLatLongMapper();
-            string point = null;
+            DegreeToDecimalLatLongMapper degreeToDecimalLatLongMapper = this.CreateDegreeToDecimalLatLongMapper();
+            string point = "3519S";
 
             // Act
-            var result = degreeToDecimalLatLongMapper.ConvertDegreeAngleToDouble(
+            string result = degreeToDecimalLatLongMapper.ConvertDegreeAngleToDouble(
                 point);
 
             // Assert
-            Assert.Fail();
+            Assert.IsTrue(result == "-35.3166666666667");
         }
 
         [TestMethod]
         public void GetAssociatedColumns_StateUnderTest_ExpectedBehavior()
         {
             // Arrange
-            var degreeToDecimalLatLongMapper = this.CreateDegreeToDecimalLatLongMapper();
+            DegreeToDecimalLatLongMapper degreeToDecimalLatLongMapper = this.CreateDegreeToDecimalLatLongMapper();
 
             // Act
-            var result = degreeToDecimalLatLongMapper.GetAssociatedColumns();
+            HashSet<string> result = degreeToDecimalLatLongMapper.GetAssociatedColumns();
 
             // Assert
-            Assert.Fail();
+            Assert.IsTrue(result.Count == 3);
         }
 
         [TestMethod]
-        public void Map_StateUnderTest_ExpectedBehavior()
+        public void Map_StateUnderTest_ExpectedBehavior_Latitude()
         {
             // Arrange
-            var degreeToDecimalLatLongMapper = this.CreateDegreeToDecimalLatLongMapper();
-            DataCellCollection sourceRows = null;
-            string columnkey = null;
-            string value = null;
-            Dictionary Context = null;
-            DataCellCollection currentState = null;
+            DegreeToDecimalLatLongMapper degreeToDecimalLatLongMapper = this.CreateDegreeToDecimalLatLongMapper();
+            DataCellCollection sourceRows = new DataCellCollection();
+            sourceRows.Add(new DataCell(new LumenWorks.Framework.IO.Csv.Column() { Name = Constants.columnkey }, "", "3519S 14804E"));
 
+            string columnkey = Constants.latitudeKey;
+            string value = "3519S 14804E";
+            DataCellCollection currentState = new DataCellCollection();
+
+            Dictionary<string, string> Context = new Dictionary<string, string>();
             // Act
-            var result = degreeToDecimalLatLongMapper.Map(
+            List<DataCell> result = degreeToDecimalLatLongMapper.Map(
                 sourceRows,
                 columnkey,
                 value,
                 Context,
                 currentState);
 
-            // Assert
-            Assert.Fail();
+            // Assert -35.3166666666667
+            Assert.IsTrue(result.Count == 1);
+            Assert.IsTrue(result[0].Value == "-35.3166666666667");
+        }
+
+        [TestMethod]
+        public void Map_StateUnderTest_ExpectedBehavior_Longitude()
+        {
+            // Arrange
+            DegreeToDecimalLatLongMapper degreeToDecimalLatLongMapper = this.CreateDegreeToDecimalLatLongMapper();
+            DataCellCollection sourceRows = new DataCellCollection();
+            sourceRows.Add(new DataCell(new LumenWorks.Framework.IO.Csv.Column() { Name = Constants.columnkey }, "", "3519S 14804E"));
+
+            string columnkey = Constants.longitudeKey;
+            string value = "3519S 14804E";
+            DataCellCollection currentState = new DataCellCollection();
+
+            Dictionary<string, string> Context = new Dictionary<string, string>();
+            // Act
+            List<DataCell> result = degreeToDecimalLatLongMapper.Map(
+                sourceRows,
+                columnkey,
+                value,
+                Context,
+                currentState);
+
+            // Assert 148.066666666667
+            Assert.IsTrue(result.Count == 1);
+            Assert.IsTrue(result[0].Value == "148.066666666667");
+        }
+
+        [TestCleanup]
+        public void TestCleanup() => this.mockRepository.VerifyAll();
+
+        [TestInitialize]
+        public void TestInitialize() => this.mockRepository = new MockRepository(MockBehavior.Strict);
+
+        private DegreeToDecimalLatLongMapper CreateDegreeToDecimalLatLongMapper()
+        {
+            RuntimeArgs arg = new RuntimeArgs
+            {
+                DegreeToDecimalLatLongMapperSettings = new Dictionary<string, string>()
+            {
+                { Constants.columnkey, Constants.columnkey  },
+                { Constants.latitudeKey, Constants.latitudeKey},
+                { Constants.longitudeKey, Constants.longitudeKey }
+            }
+            };
+
+            return new DegreeToDecimalLatLongMapper(
+                arg);
         }
     }
 }
