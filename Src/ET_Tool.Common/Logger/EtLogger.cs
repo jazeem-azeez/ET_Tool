@@ -22,7 +22,7 @@ namespace ET_Tool.Common.Logger
         {
             LoggerConfiguration loggerConfiguration = new LoggerConfiguration()
             .MinimumLevel.Debug()
-            .WriteTo.File("log.txt", restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Debug,
+            .WriteTo.File("ET_Tool.log", restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Debug,
                 rollingInterval: RollingInterval.Hour,
                 rollOnFileSizeLimit: true)
             .WriteTo.ColoredConsole(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information);

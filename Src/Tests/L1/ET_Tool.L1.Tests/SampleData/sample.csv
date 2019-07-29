@@ -1,0 +1,11 @@
+Change,Country,Location,Name,NameWoDiacritics,Subdivision,Status,Function,Date,IATA,Coordinates,Remarks
+,AU,ALO,Adelong,Adelong,NSW,RL,--3-----,0607,,3519S 14804E,
+,AU,ANB,Agnes Bank,Agnes Bank,NSW,RL,--3-----,1501,,3336S 15042E,
+,AU,AGW,Agnew,Agnew,QLD,AI,---4----,9601,,,
+,AU,WSY,Airlie Beach,Airlie Beach,QLD,AI,---4----,9912,,,
+,AU,AIR,Airlie Terminal,Airlie Terminal,WA,RL,1-------,0212,,2120S 11510E,Airlie Island
+,AU,APW,Airport West,Airport West,VIC,RL,--3-----,1207,,3744S 14453E,
+,AU,ALH,Albany,Albany,WA,AC,1--4----,9511,,,
+,AU,ACK,Albany Creek,Albany Creek,QLD,RL,-----6--,1107,,2721S 15259E,
++,AU,ABO,Alberton,Alberton,QLD,RL,--3-----,1801,,2742S 15315E,
+,AU,APK,Albion Park,Albion Park,NSW,RL,--3-----,0607,,3434S 15047E,

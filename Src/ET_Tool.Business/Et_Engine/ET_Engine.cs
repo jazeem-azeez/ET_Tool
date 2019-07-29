@@ -42,13 +42,16 @@ namespace ET_Tool.Business
             this._toSinkDataChainBuilder = new SourceToSinkDataChainBuilder(logger);
         }
 
-        public void Dispose() => throw new NotImplementedException();
+        public void Dispose()
+        { }
 
         public bool InitializePrepocessing()
         {
             try
             {
-                string[] sources = this._diskIOHandler.DirectoryGetFiles(Path.GetDirectoryName(this._runtimeSettings.SourceDataFolder), this._runtimeSettings.LookUpFilePattern, SearchOption.AllDirectories);
+                string sourceDataFolder = string.IsNullOrEmpty(this._runtimeSettings.SourceDataFolder) ? Directory.GetCurrentDirectory() : this._runtimeSettings.SourceDataFolder;
+
+                string[] sources = this._diskIOHandler.DirectoryGetFiles(Path.GetDirectoryName(sourceDataFolder), this._runtimeSettings.LookUpFilePattern, SearchOption.AllDirectories);
                 foreach (string item in sources)
                 {
                     using (IDataSource dataSource = this._dataSourceFactory.GetDataSource(item))
@@ -134,11 +137,11 @@ namespace ET_Tool.Business
             return this.RunDataAnalysis(attempt);
         }
 
-        public void PerformTransformation()
+        public bool PerformTransformation()
         {
             int ingestRowsCount = 0;
             int egressRowsCount = 0;
-          //  Console.Clear();
+            //  Console.Clear();
             using (IDataSource dataSource = this._dataSourceFactory.GetDataSource(this._runtimeSettings.DataSourceFileName))
             {
                 using (IDataSink dataSink = this._dataSinkFactory.GetDataSink(this._runtimeSettings.DataSinkFileName, this._runtimeSettings.OutConfigFileName))
@@ -171,7 +174,7 @@ namespace ET_Tool.Business
                         dataSink.AddRecordsToSink(outRowCollection.Cells);
                         egressRowsCount += 1;
 
-                        ShowProgress(egressRowsCount);
+                        this.ShowProgress(egressRowsCount);
                     }
                 }
             }
@@ -181,7 +184,7 @@ namespace ET_Tool.Business
             egressRowsCount = 0;
             using (StreamReader stream = new StreamReader(this._diskIOHandler.FileReadTextStream(this._runtimeSettings.DataSinkFileName)))
             {
-            //    int headerCount = CsvParseHelper.GetAllFields(stream.ReadLine()).Length;
+                //    int headerCount = CsvParseHelper.GetAllFields(stream.ReadLine()).Length;
 
                 while (stream.EndOfStream == false)
                 {
@@ -194,18 +197,21 @@ namespace ET_Tool.Business
                     //}
 
                     //textLines += 1;
-                    ShowProgress(egressRowsCount++);
+                    this.ShowProgress(egressRowsCount++);
                 }
             }
             this._logger.LogInformation($"\nPost Analysis Completed egress={--egressRowsCount}");
 
-            this._logger.LogInformation($"\nYour output is ready : {_runtimeSettings.DataSinkFileName}");
+            this._logger.LogInformation($"\nYour output is ready : {this._runtimeSettings.DataSinkFileName}");
+
+            return ingestRowsCount == egressRowsCount;
 
         }
 
         private void ShowProgress(int egressRowsCount)
         {
-            if (egressRowsCount % (this._runtimeSettings.TotalRows / 100) == 0 || egressRowsCount % (this._runtimeSettings.TotalRows) == 0)
+            double onepercent = this._runtimeSettings.TotalRows / 100;
+            if (Math.Round( egressRowsCount % onepercent,0) == 0 || egressRowsCount % (this._runtimeSettings.TotalRows) == 0)
             {
                 this._logger.ProgressBar(egressRowsCount, this._runtimeSettings.TotalRows);
             }

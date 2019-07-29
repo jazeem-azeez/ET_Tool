@@ -1,4 +1,20 @@
 # Getting Started 
+## Directory Scafolding Structure
+
+  1. Artifats - to share runnable binaries
+  2. Data - Contains Sample data to get Started
+  3. Doc - Main Folder to containg documentation
+  
+    1. Media - contain media content
+    
+  4. Src - Contains Source Code
+  
+    1. Et_tool - Main Program entry point , will be changed wrtt running enviornment
+    2. *.Business - Contains Logic
+    3. *.Common - Contains Shareable non business logic & implementations
+    4. *.Logging - Conaints Logging Implementation & Program stats related 
+    5. *.Injection - Conaints core injection wire up, inorder to make things modular
+   
 ## How to use
 
 First lets go through set of important files.
@@ -45,8 +61,9 @@ First lets go through set of important files.
 ### 2. MappingRules.json
     defines specific rules to be observe while mapping between source and destination
 ```javascript
-sub rule to be applied for each cell when mapping happens between 
+/*sub rule to be applied for each cell when mapping happens between 
 source & destination
+*/
 
 {
   "[source]:[columnkey]=>[destination]:[cellkey]": [ 
@@ -66,7 +83,7 @@ description : for value (FunctionCode )in source file  apply operation (split-by
 ```
 ### 3. RuntimeConfig.json
     runtime parameters & settings
-```json
+```javascript
     {
     "AutoBuild": true, /*changes behaviour to auto build & clean*/
     "LookUpFilePattern": "*.txt", /*look up file pattern file */
@@ -103,9 +120,10 @@ description : for value (FunctionCode )in source file  apply operation (split-by
 
 ## Starting the program
 
-console program should started by command prompt after configurations files are placed properly 
+After putting proper configurations, the console program can be started via command prompt with following command 
 
-:> dotnet Et_tool.dll
+## dotnet Et_tool.dll
 
-Note: paths need to be changed to reflect your filesystem
+Note: paths might needed to be changed to reflect your filesystem
+
 ### [Demo link](https://drive.google.com/open?id=16bJO51BdY26YGFMkuJPOAd-QBCzTDode)

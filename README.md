@@ -14,7 +14,7 @@ FunctionCode,FunctionDescription
 
 #### where Country_Code == Country, country_name == CountryName == Country, Location_Code==Location,Location_Name=Name,Location_Type=FunctionDescription==Function, Longitude ==Extract(Coordinate), Longitude ==Extract(Coordinate)
 
-produce in follwing format
+produce in following format
 
 #### Country_code | country_name | Location_code | Location_Name | Location_Type | Longitude | Latitude
 
@@ -27,16 +27,13 @@ produce in follwing format
 
 ### System Requriements: 
 
-1. Windows OS
+1. Windows OS or Linux Capable of running .NetCore Applications.
 2. .NetCore 2.1
-
-
-Short video on how to use <[here](.\Doc\media\intro-vid.avi) >
 
 
 [Design Documentation](https://github.com/jazeem-azeez/ET_Tool/blob/master/Doc/DesignDoc.md) - tells you how it works under the hood
 
-[Getting started ](https://github.com/jazeem-azeez/ET_Tool/blob/master/Doc/DesignDoc.md) - tells you how to use this application to perform etl
+[Getting started ](https://github.com/jazeem-azeez/ET_Tool/blob/master/Doc/HowTo.md) - tells you how to use this application to perform etl
 
 
 
