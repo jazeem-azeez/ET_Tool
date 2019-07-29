@@ -122,7 +122,7 @@ description : for value (FunctionCode )in source file  apply operation (split-by
 
 After putting proper configurations, the console program can be started via command prompt with following command 
 
-## *dotnet Et_tool.dll
+## dotnet Et_tool.dll
 
 Note: paths might needed to be changed to reflect your filesystem
 
