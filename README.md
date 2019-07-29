@@ -23,7 +23,7 @@ produce in follwing format
 
 ## Getting started with ET_Tool
 
-~ Note: I have opted for developing a microservice
+~ Note: I have opted for developing a microservice, 
 
 ### System Requriements: 
 
@@ -34,10 +34,13 @@ produce in follwing format
 Short video on how to use <[here](.\Doc\media\intro-vid.avi) >
 
 
-<[Design Documentation](.\Doc\DesignDoc.md) >
+[Design Documentation](https://github.com/jazeem-azeez/ET_Tool/blob/master/Doc/DesignDoc.md) - tells you how it works under the hood
+
+[Getting started ](https://github.com/jazeem-azeez/ET_Tool/blob/master/Doc/DesignDoc.md) - tells you how to use this application to perform etl
 
 
-## Approaches Dsicussion
+
+## Approaches discussion
 1. SQl 
    1. Export Csv & Lookup information to Sql database 
       1. Perform Iterative Cleaning to Csv Data with basic tools
