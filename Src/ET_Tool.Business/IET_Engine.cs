@@ -6,7 +6,7 @@ namespace ET_Tool.Business
     {
         bool InitializePrepocessing();
 
-        void PerformTransformation();
+        bool PerformTransformation();
 
         bool RunDataAnalysis(int attempt = 0);
 

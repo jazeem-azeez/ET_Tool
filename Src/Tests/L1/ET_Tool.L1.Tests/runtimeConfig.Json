@@ -1,0 +1,15 @@
+{
+  "AutoBuild": true,
+  "LookUpFilePattern": "*.txt",
+  "SourceDataFolder": "SampleData",
+  "DataSourceFileName": "SampleData\\sample.csv",
+  "DataSinkFileName": "out.csv",
+  "OutConfigFileName": "outConfig.json",
+  "DegreeToDecimalLatLongMapperSettings": {
+    "ColumnKey": "Coordinates",
+    "LatitudeKey": "Latitude",
+    "LongitudeKey": "Longitude"
+  },
+  "DefaultCleanerConfig": "cleanerConfig.json",
+  "MappingRulesSourcePath": "mappingRules.json"
+}

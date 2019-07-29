@@ -21,7 +21,6 @@ namespace ET_Tool.L0.Tests.Et_Engine
             // Arrange
             SourceToSinkDataChainBuilder sourceToSinkDataChainBuilder = this.CreateSourceToSinkDataChainBuilder();
 
-            //sourceToSinkDataChainBuilder.AddSourceColumns(@"Change,Country,Location,Name,NameWoDiacritics,Subdivision,Status,Function,Date,IATA,Coordinates,Remarks".Split(','));
             sourceToSinkDataChainBuilder.AddSourceColumns(@"Change,Country_code,Location_code,Location_Name,NameWoDiacritics,Subdivision,Status,FunctionCode,Date,IATA,Coordinates,Remarks".Split(','));
             sourceToSinkDataChainBuilder.AddSinkColumns(@"Country_code,country_name,Location_code,Location_Name,Location_Type,Longitude,Latitude".Split(',') );
             sourceToSinkDataChainBuilder.LookUps.Add("firstLkp", new HashSet<string>(@"Country_code,country_name".Split(',')) );
