@@ -1,4 +1,17 @@
 # Getting Started 
+## Directory Scafolding Structure
+
+  1. Artifats - to share runnable binaries
+  2. Data - Contains Sample Data to get Started
+  3. Doc - Main FIlder to containg documentation
+    1. Media - contain media content
+  4. Src - Contains Source Code
+    2. Et_tool - Main Program entry point , will be changed wrtt running enviornment
+    3. *.Business - Contains Logic
+    4. *.Common - Contains Shareable non business logic & implementations
+    5. *.Logging - Conaints Logging Implementation & Program stats related 
+    6. *.Injection - Conaints core injection wire up, inorder to make things modular
+   
 ## How to use
 
 First lets go through set of important files.
@@ -45,8 +58,9 @@ First lets go through set of important files.
 ### 2. MappingRules.json
     defines specific rules to be observe while mapping between source and destination
 ```javascript
-sub rule to be applied for each cell when mapping happens between 
+/*sub rule to be applied for each cell when mapping happens between 
 source & destination
+*/
 
 {
   "[source]:[columnkey]=>[destination]:[cellkey]": [ 
