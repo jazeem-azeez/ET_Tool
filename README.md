@@ -21,6 +21,8 @@ produce in following format
 #### AU Australia ALO Adelong Road Terminal -35.3 148.06666666666666
 #### AU Australia ANB Agnes Bank Road Terminal -33.6 150.7
 
+#### find output in Artifacts folder
+
 ## Getting started with ET_Tool
 
 ~ Note: I have opted for developing a microservice, 
