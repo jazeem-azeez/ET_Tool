@@ -2,8 +2,8 @@
 ## Directory Scafolding Structure
 
   1. Artifats - to share runnable binaries
-  2. Data - Contains Sample Data to get Started
-  3. Doc - Main FIlder to containg documentation
+  2. Data - Contains Sample data to get Started
+  3. Doc - Main Folder to containg documentation
     1. Media - contain media content
   4. Src - Contains Source Code
     2. Et_tool - Main Program entry point , will be changed wrtt running enviornment
