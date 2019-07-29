@@ -103,7 +103,9 @@ description : for value (FunctionCode )in source file  apply operation (split-by
 
 ## Starting the program
 
-console program should started by double clicking or via command prompt after configurations files are placed properly 
+console program should started by command prompt after configurations files are placed properly 
+
+:> dotnet Et_tool.dll
 
 Note: paths need to be changed to reflect your filesystem
-
+### [Demo link](https://drive.google.com/open?id=16bJO51BdY26YGFMkuJPOAd-QBCzTDode)

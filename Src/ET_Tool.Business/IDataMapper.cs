@@ -9,7 +9,7 @@ namespace ET_Tool.Business
     {
         string Name { get; }
 
-        void BindToLookUpCollection(Dictionary<string, DataLookUpCollection> globalLookUpCollection);
+        void BindToLookUpCollection(Dictionary<string, IDataLookUpCollection> globalLookUpCollection);
 
         List<DataCell> Map(DataCellCollection sourceRow, string columnkey, string value,  Dictionary<string, string> Context, DataCellCollection currentState);
         HashSet<string> GetAssociatedColumns();

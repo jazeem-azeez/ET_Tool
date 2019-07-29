@@ -8,7 +8,7 @@ using ET_Tool.Common.Models;
 
 namespace ET_Tool.Business.Mappers
 {
-    public class DataLookUpCollection
+    public class DataLookUpCollection : IDataLookUpCollection
     {
         private readonly DataTable _dataTable;
         private readonly Dictionary<string, string> _dictionaryLookup;

@@ -15,7 +15,7 @@ namespace ET_Tool.Business.Mappers.Transformation
 
         public string Name => "DegreeToDecimalLatLongMapper";
 
-        public void BindToLookUpCollection(Dictionary<string, DataLookUpCollection> globalLookUpCollection)
+        public void BindToLookUpCollection(Dictionary<string, IDataLookUpCollection> globalLookUpCollection)
         {
             // NOP method
         }

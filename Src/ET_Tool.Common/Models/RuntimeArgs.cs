@@ -13,5 +13,6 @@ namespace ET_Tool.Business
         public Dictionary<string,string> DegreeToDecimalLatLongMapperSettings { get; set; }
         public string DefaultCleanerConfig { get; set; }
         public string MappingRulesSourcePath { get; set; }
+        public int TotalRows { get; set; }
     }
 }

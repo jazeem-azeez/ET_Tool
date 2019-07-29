@@ -15,7 +15,7 @@ namespace ET_Tool.Business.Mappers
         private readonly Dictionary<string, List<string>> _filterRulesCollection = new Dictionary<string, List<string>>();
         private readonly IEtLogger _logger;
         private readonly Dictionary<string, List<string>> _mappingRulesCollection = new Dictionary<string, List<string>>();
-        private readonly Dictionary<string, DataLookUpCollection> _globalLookUpCollection = new Dictionary<string, DataLookUpCollection>();
+        private readonly Dictionary<string, IDataLookUpCollection> _globalLookUpCollection = new Dictionary<string, IDataLookUpCollection>();
 
         public DataResolver(Dictionary<string, IDataMapper> dataMappers, Dictionary<string, IDataFilter> dataFilter, IEtLogger logger)
         {
@@ -32,7 +32,7 @@ namespace ET_Tool.Business.Mappers
         public IEnumerable<IDataFilter> GetAllFilter() => this._dataFilter.Values;
 
 
-        public void AddNewDataLookUp(string key, DataLookUpCollection lookUpCollection) => this._globalLookUpCollection.Add(key, lookUpCollection);
+        public void AddNewDataLookUp(string key, IDataLookUpCollection lookUpCollection) => this._globalLookUpCollection.Add(key, lookUpCollection);
         public void AddNewMappingRule(string key, List<string> rules) => this._mappingRulesCollection.Add(key, rules);
 
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-
+using System.Linq;
 using ET_Tool.Common.Logger;
 
 namespace ET_Tool.Business.Mappers
@@ -47,8 +47,11 @@ namespace ET_Tool.Business.Mappers
         {
             string value = string.Empty;
             bool hasResolved;
+            int lenght = 0;
             foreach (string sinkItem in this.SinkColumns)
             {
+             //   this._logger.ProgressBar(lenght++, this.SinkColumns.Count);
+
                 hasResolved = false;
 
                 if (this.SourceColumns.Contains(sinkItem))
@@ -85,6 +88,9 @@ namespace ET_Tool.Business.Mappers
                     }
                 }
             }
+
+            this._logger.LogInformation("Source to destination Chain building completed");
+            this._logger.ShowTable("Source to destination Data Chain", new string[] { "SourceColumns", "Path" }, this.Chain.Select(link => new string[] { link.Key, link.Value }).ToList(), true);
 
             foreach (string item in this.SinkColumns)
             {

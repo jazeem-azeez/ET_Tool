@@ -6,7 +6,7 @@ namespace ET_Tool.Business.Mappers
 {
     public interface IDataResolver
     {
-        void AddNewDataLookUp(string key, DataLookUpCollection lookUpCollection);
+        void AddNewDataLookUp(string key, IDataLookUpCollection lookUpCollection);
 
         void AddNewMappingRule(string key, List<string> rules);
 

@@ -32,7 +32,7 @@ namespace ET_Tool
             {
                 engine.PerformTransformation();
             }
-            
+            logger.LogInformation("Press Enter to Exit");
             Console.ReadLine();
             /*
              * 1. Load Configurations

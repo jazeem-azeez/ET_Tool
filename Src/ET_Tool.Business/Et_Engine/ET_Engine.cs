@@ -53,7 +53,7 @@ namespace ET_Tool.Business
                 {
                     using (IDataSource dataSource = this._dataSourceFactory.GetDataSource(item))
                     {
-                        DataLookUpCollection lookUpCollection = new DataLookUpCollection(dataSource, this._logger);
+                        IDataLookUpCollection lookUpCollection = new DataLookUpCollection(dataSource, this._logger);
                         string key = Path.GetFileName(item);
                         this._toSinkDataChainBuilder.LookUps.Add(key, new HashSet<string>(dataSource.GetHeaders()));
                         this._dataMapHandler.AddNewDataLookUp(key, lookUpCollection);
@@ -138,7 +138,7 @@ namespace ET_Tool.Business
         {
             int ingestRowsCount = 0;
             int egressRowsCount = 0;
-
+          //  Console.Clear();
             using (IDataSource dataSource = this._dataSourceFactory.GetDataSource(this._runtimeSettings.DataSourceFileName))
             {
                 using (IDataSink dataSink = this._dataSinkFactory.GetDataSink(this._runtimeSettings.DataSinkFileName, this._runtimeSettings.OutConfigFileName))
@@ -151,6 +151,7 @@ namespace ET_Tool.Business
                         DataCellCollection outRowCollection = new DataCellCollection();
                         for (int i = 0; i < dataSink.Columns.Length; i++)
                         {
+
                             Dictionary<string, string> steps = this._toSinkDataChainBuilder.GetSteps(dataSink.Columns[i]);
 
                             try
@@ -169,10 +170,45 @@ namespace ET_Tool.Business
                         }
                         dataSink.AddRecordsToSink(outRowCollection.Cells);
                         egressRowsCount += 1;
+
+                        ShowProgress(egressRowsCount);
                     }
                 }
             }
+            this._logger.LogInformation($"Processing Compeleted");
             this._logger.LogInformation($"Ingest = {ingestRowsCount} egress={egressRowsCount}");
+            this._logger.LogInformation($"Initiating Post Run Analysis ");
+            egressRowsCount = 0;
+            using (StreamReader stream = new StreamReader(this._diskIOHandler.FileReadTextStream(this._runtimeSettings.DataSinkFileName)))
+            {
+            //    int headerCount = CsvParseHelper.GetAllFields(stream.ReadLine()).Length;
+
+                while (stream.EndOfStream == false)
+                {
+                    string line = stream.ReadLine();
+                    //int cellcount = CsvParseHelper.GetAllFields(line).Length;
+                    //if (cellcount != headerCount)
+                    //{
+                    //    this._logger.Log($"Error Data Alignment mismatch cellcount {cellcount } != headerCount {headerCount } att position {textLines} , line :{line}", EventLevel.Error);
+                    //    noError++;
+                    //}
+
+                    //textLines += 1;
+                    ShowProgress(egressRowsCount++);
+                }
+            }
+            this._logger.LogInformation($"\nPost Analysis Completed egress={--egressRowsCount}");
+
+            this._logger.LogInformation($"\nYour output is ready : {_runtimeSettings.DataSinkFileName}");
+
+        }
+
+        private void ShowProgress(int egressRowsCount)
+        {
+            if (egressRowsCount % (this._runtimeSettings.TotalRows / 100) == 0 || egressRowsCount % (this._runtimeSettings.TotalRows) == 0)
+            {
+                this._logger.ProgressBar(egressRowsCount, this._runtimeSettings.TotalRows);
+            }
         }
 
         public bool RunDataAnalysis(int attempt = 0)
@@ -187,7 +223,7 @@ namespace ET_Tool.Business
 
             this._logger.LogInformation("Scanning using text parser started");
 
-            int csvLines = 0, textLines = 0, noError = 0; 
+            int csvLines = 0, textLines = 0, noError = 0;
             using (StreamReader stream = new StreamReader(this._diskIOHandler.FileReadTextStream(this._runtimeSettings.DataSourceFileName)))
             {
                 int headerCount = CsvParseHelper.GetAllFields(stream.ReadLine()).Length;
@@ -223,6 +259,7 @@ namespace ET_Tool.Business
                 }
             }
             this._logger.LogInformation($"Scanning using csv parser completed with {noError} errors");
+            this._runtimeSettings.TotalRows = textLines;
 
             if (textLines == csvLines && noError == 0)
             {
@@ -251,13 +288,13 @@ namespace ET_Tool.Business
                     string[] items = data.Skip(i).Take(headerRow.Length).ToArray();
                     if (items.Length != headerRow.Length)
                     {
-                        fixedLineItem = GetAssist(index, line,items);
+                        fixedLineItem = this.GetAssist(index, line, items);
                     }
                     else
                     {
                         fixedLineItem = string.Join(",", items);
                     }
-                    _logger.LogInformation(fixedLineItem); 
+                    this._logger.LogInformation(fixedLineItem);
                     fixedLines.Add(fixedLineItem);
                 }
 
@@ -265,7 +302,7 @@ namespace ET_Tool.Business
             }
             else
             {
-                fixedLineItem = GetAssist(index, line,data);
+                fixedLineItem = this.GetAssist(index, line, data);
                 fixedLines.Add(fixedLineItem);
             }
 
@@ -275,7 +312,7 @@ namespace ET_Tool.Business
         private string GetAssist(int index, string line, string[] items)
         {
             string input;
-            this._logger.LogInformation($"Unable to Auto fix for \r\n line {index} : {line} \r\n data [{string.Join(",",items)}] ");
+            this._logger.LogInformation($"Unable to Auto fix for \r\n line {index} : {line} \r\n data [{string.Join(",", items)}] ");
             Console.WriteLine("Please provide correct data: line ");
             input = Console.ReadLine();
             return input;
